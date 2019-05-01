@@ -1,0 +1,3 @@
+/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/iprefresher.dir
+/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/edit_cache.dir
