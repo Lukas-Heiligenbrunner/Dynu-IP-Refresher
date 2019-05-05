@@ -7,8 +7,7 @@
 #include <string>
 #include <iostream>
 
-#include <stdio.h>
-#include <curl/curl.h>
+#include "curl/curl.h"
 #include <sstream>
 
 #include "Hashmap.h"
