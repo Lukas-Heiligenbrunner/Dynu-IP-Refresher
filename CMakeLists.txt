@@ -7,9 +7,10 @@ find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})
 
 
-set(SOURCE main.cpp API.h API.cpp Hashmap.h)
+set(SOURCE src/main.cpp src/API.h src/API.cpp src/Hashmap.h)
 
-add_executable(iprefresher ${SOURCE})
+add_executable(iprefresher  ${SOURCE})
+
 
 
 target_link_libraries(iprefresher ${CURL_LIBRARIES})

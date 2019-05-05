@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <curl/curl.h>
+#include <sstream>
 
 #include "Hashmap.h"
 
@@ -31,13 +32,9 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
         list = curl_slist_append(list, headers.at(j).c_str());
     }
 
-
-//        list = curl_slist_append(list, "Accept:");
-
     std::string readString;
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
-
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
 
@@ -47,16 +44,19 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
 
         if(post){
             std::cout << "add post data\n";
-            std::string poststring;
+            std::stringstream poststring;
+            poststring <<  "{";
             for (int i = 0; i < map.size(); i++) {
-                poststring+=map.getKey(i)+"="+map.getValue(i);
+                poststring << "\""+map.getKey(i) << "\": \""+map.getValue(i) << "\"";
                 if(i < map.size()-1){
-                    poststring+="&";
+                    poststring << ", ";
                 }
             }
-            std::cout << "post string: " << poststring << "\n";
+            poststring << "}";
+
+            std::cout << "post string: " << poststring.str() << "\n";
             curl_easy_setopt(curl, CURLOPT_POST, 1);
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, poststring.c_str());
+            curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, poststring.str().c_str());
         }else{
             std::string getstring;
             for(int i =0; i< map.size();i++){
