@@ -43,7 +43,6 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
         if(post){
-            std::cout << "add post data\n";
             std::stringstream poststring;
             poststring <<  "{";
             for (int i = 0; i < map.size(); i++) {
@@ -54,7 +53,7 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
             }
             poststring << "}";
 
-            std::cout << "post string: " << poststring.str() << "\n";
+//            std::cout << "post string: " << poststring.str() << "\n";
             curl_easy_setopt(curl, CURLOPT_POST, 1);
             curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, poststring.str().c_str());
         }else{
