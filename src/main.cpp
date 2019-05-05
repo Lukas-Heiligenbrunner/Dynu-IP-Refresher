@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+
 #include "API.h"
 #include "Logger.h"
 
@@ -9,7 +10,6 @@ int main() {
 
 
     std::string ip = api.request("https://api.ipify.org");
-    std::cout << "ip is: " << ip <<std::endl;
 
     std::string oldip = logger.readip();
 
@@ -35,6 +35,10 @@ int main() {
         std::string dynurepl = api.request("https://api.dynu.com/v2/dns/8506047",true, args,headers);
 
         std::cout << "---" << dynurepl << std::endl;
+
+        if (dynurepl != "{\"statusCode\":200}"){
+            logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
+        }
 
         logger.safeip(ip);
     }
