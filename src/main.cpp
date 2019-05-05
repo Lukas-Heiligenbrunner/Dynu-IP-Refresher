@@ -21,9 +21,9 @@ int main() {
 
         if(oldip == ip){
             std::cout << "no change -- ip: " << ip << std::endl;
-            logger.logToLogfile("no change -- ip: "+ip);
+            logger.logToLogfile(" [INFO] no change -- ip: "+ip);
         } else{
-            logger.logToLogfile("ip changed! -- from :" + oldip + "to: "+ip);
+            logger.logToLogfile(" [INFO] ip changed! -- from :" + oldip + "to: "+ip);
             std::cout << "ip changed! -- from :" << oldip << "to: " << ip << std::endl;
 
             //api key: 88vNpMfDhMM2YYDNfWR1DNYfRX9W6fYg
@@ -40,7 +40,7 @@ int main() {
 
             std::string dynurepl = api.request("https://api.dynu.com/v2/dns/8506047",true, args,headers);
 
-            std::cout << "---" << dynurepl << std::endl;
+            std::cout << "[ DEBUG ] api reply:: " << dynurepl << std::endl;
 
             if (dynurepl != "{\"statusCode\":200}"){
                 logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");

@@ -3,14 +3,14 @@
 //
 
 #include "API.h"
+#include "Hashmap.h"
 
 #include <string>
 #include <iostream>
-
-#include "curl/curl.h"
 #include <sstream>
 
-#include "Hashmap.h"
+#include <curl/curl.h>
+
 
 std::string API::request(std::string myurl) {
     Hashmap<std::string,std::string> map;
@@ -19,7 +19,7 @@ std::string API::request(std::string myurl) {
     return request(myurl,false,map,str);
 }
 
-std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::string> &map, std::vector<std::string> headers) {
+std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::string> &map, std::vector<std::string> &headers) {
     CURL *curl;
     CURLcode res;
 
@@ -52,7 +52,6 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
             }
             poststring << "}";
 
-//            std::cout << "post string: " << poststring.str() << "\n";
             curl_easy_setopt(curl, CURLOPT_POST, 1);
             curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, poststring.str().c_str());
         }else{
