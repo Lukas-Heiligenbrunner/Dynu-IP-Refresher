@@ -43,10 +43,10 @@ RM = /home/lukas/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/191.6707.69/bin/
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/lukas/CLionProjects/iprefresher
+CMAKE_SOURCE_DIR = /home/lukas/CLionProjects/DynuIPRefresher
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/lukas/CLionProjects/iprefresher/cmake-build-debug
+CMAKE_BINARY_DIR = /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/iprefresher.dir/depend.make
@@ -57,45 +57,46 @@ include CMakeFiles/iprefresher.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/iprefresher.dir/flags.make
 
-CMakeFiles/iprefresher.dir/main.cpp.o: CMakeFiles/iprefresher.dir/flags.make
-CMakeFiles/iprefresher.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/iprefresher.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/iprefresher.dir/main.cpp.o -c /home/lukas/CLionProjects/iprefresher/main.cpp
+CMakeFiles/iprefresher.dir/src/main.cpp.o: CMakeFiles/iprefresher.dir/flags.make
+CMakeFiles/iprefresher.dir/src/main.cpp.o: ../src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/iprefresher.dir/src/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/iprefresher.dir/src/main.cpp.o -c /home/lukas/CLionProjects/DynuIPRefresher/src/main.cpp
 
-CMakeFiles/iprefresher.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/iprefresher.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lukas/CLionProjects/iprefresher/main.cpp > CMakeFiles/iprefresher.dir/main.cpp.i
+CMakeFiles/iprefresher.dir/src/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/iprefresher.dir/src/main.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lukas/CLionProjects/DynuIPRefresher/src/main.cpp > CMakeFiles/iprefresher.dir/src/main.cpp.i
 
-CMakeFiles/iprefresher.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/iprefresher.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lukas/CLionProjects/iprefresher/main.cpp -o CMakeFiles/iprefresher.dir/main.cpp.s
+CMakeFiles/iprefresher.dir/src/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/iprefresher.dir/src/main.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lukas/CLionProjects/DynuIPRefresher/src/main.cpp -o CMakeFiles/iprefresher.dir/src/main.cpp.s
 
-CMakeFiles/iprefresher.dir/API.cpp.o: CMakeFiles/iprefresher.dir/flags.make
-CMakeFiles/iprefresher.dir/API.cpp.o: ../API.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/iprefresher.dir/API.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/iprefresher.dir/API.cpp.o -c /home/lukas/CLionProjects/iprefresher/API.cpp
+CMakeFiles/iprefresher.dir/src/API.cpp.o: CMakeFiles/iprefresher.dir/flags.make
+CMakeFiles/iprefresher.dir/src/API.cpp.o: ../src/API.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/iprefresher.dir/src/API.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/iprefresher.dir/src/API.cpp.o -c /home/lukas/CLionProjects/DynuIPRefresher/src/API.cpp
 
-CMakeFiles/iprefresher.dir/API.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/iprefresher.dir/API.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lukas/CLionProjects/iprefresher/API.cpp > CMakeFiles/iprefresher.dir/API.cpp.i
+CMakeFiles/iprefresher.dir/src/API.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/iprefresher.dir/src/API.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lukas/CLionProjects/DynuIPRefresher/src/API.cpp > CMakeFiles/iprefresher.dir/src/API.cpp.i
 
-CMakeFiles/iprefresher.dir/API.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/iprefresher.dir/API.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lukas/CLionProjects/iprefresher/API.cpp -o CMakeFiles/iprefresher.dir/API.cpp.s
+CMakeFiles/iprefresher.dir/src/API.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/iprefresher.dir/src/API.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lukas/CLionProjects/DynuIPRefresher/src/API.cpp -o CMakeFiles/iprefresher.dir/src/API.cpp.s
 
 # Object files for target iprefresher
 iprefresher_OBJECTS = \
-"CMakeFiles/iprefresher.dir/main.cpp.o" \
-"CMakeFiles/iprefresher.dir/API.cpp.o"
+"CMakeFiles/iprefresher.dir/src/main.cpp.o" \
+"CMakeFiles/iprefresher.dir/src/API.cpp.o"
 
 # External object files for target iprefresher
 iprefresher_EXTERNAL_OBJECTS =
 
-iprefresher: CMakeFiles/iprefresher.dir/main.cpp.o
-iprefresher: CMakeFiles/iprefresher.dir/API.cpp.o
+iprefresher: CMakeFiles/iprefresher.dir/src/main.cpp.o
+iprefresher: CMakeFiles/iprefresher.dir/src/API.cpp.o
 iprefresher: CMakeFiles/iprefresher.dir/build.make
+iprefresher: /usr/lib/x86_64-linux-gnu/libcurl.so
 iprefresher: CMakeFiles/iprefresher.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable iprefresher"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable iprefresher"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/iprefresher.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -108,6 +109,6 @@ CMakeFiles/iprefresher.dir/clean:
 .PHONY : CMakeFiles/iprefresher.dir/clean
 
 CMakeFiles/iprefresher.dir/depend:
-	cd /home/lukas/CLionProjects/iprefresher/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/lukas/CLionProjects/iprefresher /home/lukas/CLionProjects/iprefresher /home/lukas/CLionProjects/iprefresher/cmake-build-debug /home/lukas/CLionProjects/iprefresher/cmake-build-debug /home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/iprefresher.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/lukas/CLionProjects/DynuIPRefresher /home/lukas/CLionProjects/DynuIPRefresher /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles/iprefresher.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/iprefresher.dir/depend
 

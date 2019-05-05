@@ -6,9 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/lukas/CLionProjects/iprefresher/API.cpp
+/home/lukas/CLionProjects/DynuIPRefresher/src/API.cpp
 API.h
-/home/lukas/CLionProjects/iprefresher/API.h
+/home/lukas/CLionProjects/DynuIPRefresher/src/API.h
 string
 -
 iostream
@@ -17,18 +17,26 @@ stdio.h
 -
 curl/curl.h
 -
+sstream
+-
 Hashmap.h
-/home/lukas/CLionProjects/iprefresher/Hashmap.h
+/home/lukas/CLionProjects/DynuIPRefresher/src/Hashmap.h
 
-/home/lukas/CLionProjects/iprefresher/API.h
+/home/lukas/CLionProjects/DynuIPRefresher/src/API.h
 string
 -
 Hashmap.h
-/home/lukas/CLionProjects/iprefresher/Hashmap.h
+/home/lukas/CLionProjects/DynuIPRefresher/src/Hashmap.h
 
-/home/lukas/CLionProjects/iprefresher/Hashmap.h
+/home/lukas/CLionProjects/DynuIPRefresher/src/Hashmap.h
 iostream
 -
 vector
 -
+
+/home/lukas/CLionProjects/DynuIPRefresher/src/main.cpp
+iostream
+-
+API.h
+/home/lukas/CLionProjects/DynuIPRefresher/src/API.h
 

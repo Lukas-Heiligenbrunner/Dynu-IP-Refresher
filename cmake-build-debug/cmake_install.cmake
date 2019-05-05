@@ -1,4 +1,4 @@
-# Install script for directory: /home/lukas/CLionProjects/iprefresher
+# Install script for directory: /home/lukas/CLionProjects/DynuIPRefresher
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/lukas/CLionProjects/iprefresher/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

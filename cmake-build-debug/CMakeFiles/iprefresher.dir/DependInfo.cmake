@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/lukas/CLionProjects/iprefresher/API.cpp" "/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/iprefresher.dir/API.cpp.o"
-  "/home/lukas/CLionProjects/iprefresher/main.cpp" "/home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/iprefresher.dir/main.cpp.o"
+  "/home/lukas/CLionProjects/DynuIPRefresher/src/API.cpp" "/home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles/iprefresher.dir/src/API.cpp.o"
+  "/home/lukas/CLionProjects/DynuIPRefresher/src/main.cpp" "/home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles/iprefresher.dir/src/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

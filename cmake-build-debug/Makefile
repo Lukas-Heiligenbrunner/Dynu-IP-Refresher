@@ -48,10 +48,10 @@ RM = /home/lukas/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/191.6707.69/bin/
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/lukas/CLionProjects/iprefresher
+CMAKE_SOURCE_DIR = /home/lukas/CLionProjects/DynuIPRefresher
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/lukas/CLionProjects/iprefresher/cmake-build-debug
+CMAKE_BINARY_DIR = /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles /home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lukas/CLionProjects/iprefresher/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lukas/CLionProjects/DynuIPRefresher/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -123,59 +123,59 @@ iprefresher/fast:
 	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/build
 .PHONY : iprefresher/fast
 
-API.o: API.cpp.o
+src/API.o: src/API.cpp.o
 
-.PHONY : API.o
-
-# target to build an object file
-API.cpp.o:
-	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/API.cpp.o
-.PHONY : API.cpp.o
-
-API.i: API.cpp.i
-
-.PHONY : API.i
-
-# target to preprocess a source file
-API.cpp.i:
-	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/API.cpp.i
-.PHONY : API.cpp.i
-
-API.s: API.cpp.s
-
-.PHONY : API.s
-
-# target to generate assembly for a file
-API.cpp.s:
-	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/API.cpp.s
-.PHONY : API.cpp.s
-
-main.o: main.cpp.o
-
-.PHONY : main.o
+.PHONY : src/API.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/main.cpp.o
-.PHONY : main.cpp.o
+src/API.cpp.o:
+	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/src/API.cpp.o
+.PHONY : src/API.cpp.o
 
-main.i: main.cpp.i
+src/API.i: src/API.cpp.i
 
-.PHONY : main.i
+.PHONY : src/API.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/main.cpp.i
-.PHONY : main.cpp.i
+src/API.cpp.i:
+	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/src/API.cpp.i
+.PHONY : src/API.cpp.i
 
-main.s: main.cpp.s
+src/API.s: src/API.cpp.s
 
-.PHONY : main.s
+.PHONY : src/API.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/main.cpp.s
-.PHONY : main.cpp.s
+src/API.cpp.s:
+	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/src/API.cpp.s
+.PHONY : src/API.cpp.s
+
+src/main.o: src/main.cpp.o
+
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.cpp.o:
+	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
+
+src/main.i: src/main.cpp.i
+
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	$(MAKE) -f CMakeFiles/iprefresher.dir/build.make CMakeFiles/iprefresher.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
 
 # Help Target
 help:
@@ -186,12 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... iprefresher"
 	@echo "... edit_cache"
-	@echo "... API.o"
-	@echo "... API.i"
-	@echo "... API.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... src/API.o"
+	@echo "... src/API.i"
+	@echo "... src/API.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 
