@@ -8,7 +8,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
 #include <curl/curl.h>
 
 
@@ -16,7 +15,7 @@ std::string API::request(std::string myurl) {
     Hashmap<std::string,std::string> map;
     std::vector<std::string> str;
 
-    return request(myurl,false,map,str);
+    return request(std::move(myurl),false,map,str);
 }
 
 std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::string> &map, std::vector<std::string> &headers) {
@@ -26,7 +25,7 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
 
     curl = curl_easy_init();
 
-    struct curl_slist *list = NULL;
+    struct curl_slist *list = nullptr;
     for (int j = 0; j < headers.size(); ++j) {
         list = curl_slist_append(list, headers.at(j).c_str());
     }
