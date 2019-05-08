@@ -3,7 +3,7 @@
 //
 
 #include "API.h"
-#include "Hashmap.h"
+#include "../Hashmap.h"
 
 #include <string>
 #include <iostream>

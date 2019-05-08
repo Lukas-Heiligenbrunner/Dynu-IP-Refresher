@@ -1,8 +1,9 @@
 #include <iostream>
 #include <ctime>
 
-#include "API.h"
+#include "api/API.h"
 #include "Logger.h"
+#include "api/TelegramAPI.h"
 
 int main(int argc, char *argv[]) {
 
@@ -57,6 +58,9 @@ int main(int argc, char *argv[]) {
 
                 if (dynurepl != "{\"statusCode\":200}") {
                     logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
+                } else{
+                    TelegramAPI tele;
+                    tele.sendMessage(oldip + " moved to " + ip);
                 }
 
                 logger.safeip(ip);

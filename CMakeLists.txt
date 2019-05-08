@@ -7,7 +7,20 @@ find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})
 
 
-set(SOURCE src/main.cpp src/API.h src/API.cpp src/Hashmap.h src/Logger.cpp src/Logger.h)
+set(SOURCE
+        src/main.cpp
+
+        src/api/API.h
+        src/api/API.cpp
+
+        src/Hashmap.h
+
+        src/Logger.cpp
+        src/Logger.h
+
+        src/api/TelegramAPI.cpp
+        src/api/TelegramAPI.h
+        )
 
 add_executable(iprefresher  ${SOURCE})
 
