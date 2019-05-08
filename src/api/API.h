@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "../Hashmap.h"
+#include "Hashmap.h"
 
 class API {
 public:

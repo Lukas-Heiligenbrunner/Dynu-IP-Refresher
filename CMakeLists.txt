@@ -13,7 +13,7 @@ set(SOURCE
         src/api/API.h
         src/api/API.cpp
 
-        src/Hashmap.h
+        src/api/Hashmap.h
 
         src/Logger.cpp
         src/Logger.h
