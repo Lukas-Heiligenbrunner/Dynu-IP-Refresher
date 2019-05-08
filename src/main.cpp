@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
                 if (dynurepl != "{\"statusCode\":200}") {
                     logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
-                } else{
+                } else {
                     TelegramAPI tele;
                     tele.sendMessage(oldip + " moved to " + ip);
                 }

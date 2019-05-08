@@ -9,7 +9,7 @@
 #include <string>
 #include "API.h"
 
-class TelegramAPI : API{
+class TelegramAPI : API {
 public:
     void sendMessage(std::string text);
 

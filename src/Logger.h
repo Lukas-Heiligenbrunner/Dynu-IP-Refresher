@@ -9,7 +9,9 @@
 class Logger {
 public:
     void logToLogfile(std::string text);
+
     void safeip(std::string ip);
+
     std::string readip();
 
 };

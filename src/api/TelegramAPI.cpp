@@ -5,6 +5,6 @@
 #include "TelegramAPI.h"
 
 void TelegramAPI::sendMessage(std::string text) {
-    std::string reply = request("https://api.telegram.org/bot"+ apikey + "/sendmessage?chat_id="+chatid+"&text="+text);
-    std::cout << "[DEBUG] " <<reply << std::endl;
+    std::string reply = request("https://api.telegram.org/bot" + apikey + "/sendmessage?chat_id=" + chatid + "&text=" + text);
+    std::cout << "[DEBUG] " << reply << std::endl;
 }

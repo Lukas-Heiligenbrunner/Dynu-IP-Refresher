@@ -9,10 +9,13 @@
 #include <iostream>
 #include <vector>
 
-template <class keytype,class valuetype> class Hashmap {
+template<class keytype, class valuetype>
+class Hashmap {
 public:
-    void add(keytype key,keytype value);
+    void add(keytype key, keytype value);
+
     keytype getKey(int position);
+
     valuetype getValue(int position);
 
     int size();

@@ -12,13 +12,14 @@
 
 
 std::string API::request(std::string myurl) {
-    Hashmap<std::string,std::string> map;
+    Hashmap<std::string, std::string> map;
     std::vector<std::string> str;
 
-    return request(std::move(myurl),false,map,str);
+    return request(std::move(myurl), false, map, str);
 }
 
-std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::string> &map, std::vector<std::string> &headers) {
+std::string
+API::request(std::string myurl, bool post, Hashmap<std::string, std::string> &map, std::vector<std::string> &headers) {
     CURL *curl;
     CURLcode res;
 
@@ -40,12 +41,12 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
-        if(post){
+        if (post) {
             std::stringstream poststring;
-            poststring <<  "{";
+            poststring << "{";
             for (int i = 0; i < map.size(); i++) {
-                poststring << "\""+map.getKey(i) << "\": \""+map.getValue(i) << "\"";
-                if(i < map.size()-1){
+                poststring << "\"" + map.getKey(i) << "\": \"" + map.getValue(i) << "\"";
+                if (i < map.size() - 1) {
                     poststring << ", ";
                 }
             }
@@ -53,18 +54,17 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
 
             curl_easy_setopt(curl, CURLOPT_POST, 1);
             curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, poststring.str().c_str());
-        }else{
+        } else {
             std::string getstring;
-            for(int i =0; i< map.size();i++){
-                getstring+=map.getKey(i)+"="+map.getValue(i);
-                if(i < map.size()-1){
-                    getstring+="&";
+            for (int i = 0; i < map.size(); i++) {
+                getstring += map.getKey(i) + "=" + map.getValue(i);
+                if (i < map.size() - 1) {
+                    getstring += "&";
                 }
             }
 
-            myurl+="?"+getstring;
+            myurl += "?" + getstring;
         }
-
 
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
@@ -78,6 +78,6 @@ std::string API::request(std::string myurl, bool post, Hashmap<std::string,std::
 }
 
 size_t API::write_data(void *contents, size_t size, size_t nmemb, FILE *stream) {
-    ((std::string*)stream)->append((char*)contents, size * nmemb);
+    ((std::string *) stream)->append((char *) contents, size * nmemb);
     return size * nmemb;
 }
