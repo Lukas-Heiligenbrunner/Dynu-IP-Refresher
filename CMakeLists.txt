@@ -23,7 +23,6 @@ set(SOURCE
         )
 
 add_executable(iprefresher  ${SOURCE})
-
-
-
 target_link_libraries(iprefresher ${CURL_LIBRARIES})
+
+install (TARGETS iprefresher DESTINATION bin)
