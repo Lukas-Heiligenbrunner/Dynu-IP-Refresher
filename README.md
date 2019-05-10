@@ -13,7 +13,7 @@
 
 `nano control`
 
-`Source: iprefresher
+```Source: iprefresher
 Section: net
 Priority: optional
 Maintainer: Lukas Heiligenbrunner <lukas@unknown>
@@ -24,7 +24,7 @@ Package: iprefresher
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: a dynu.net ip refresher written in c++
- a dynu.net ip refresher written in c++`
+ a dynu.net ip refresher written in c++```
 
 
 `dpkg-buildpackage -S -us -uc `
