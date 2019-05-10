@@ -29,7 +29,8 @@ Package: iprefresher
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: a dynu.net ip refresher written in c++
- a dynu.net ip refresher written in c++```
+ a dynu.net ip refresher written in c++
+```
 
 
 `dpkg-buildpackage -S -us -uc `
