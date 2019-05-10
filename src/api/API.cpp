@@ -33,7 +33,6 @@ API::request(std::string myurl, bool post, Hashmap<std::string, std::string> &ma
 
     std::string readString;
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
 
@@ -55,16 +54,20 @@ API::request(std::string myurl, bool post, Hashmap<std::string, std::string> &ma
             curl_easy_setopt(curl, CURLOPT_POST, 1);
             curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, poststring.str().c_str());
         } else {
-            std::string getstring;
-            for (int i = 0; i < map.size(); i++) {
-                getstring += map.getKey(i) + "=" + map.getValue(i);
-                if (i < map.size() - 1) {
-                    getstring += "&";
+            if (map.size() > 0) {
+                std::string getstring;
+                for (int i = 0; i < map.size(); i++) {
+                    getstring += map.getKey(i) + "=" + map.getValue(i);
+                    if (i < map.size() - 1) {
+                        getstring += "&";
+                    }
                 }
-            }
 
-            myurl += "?" + getstring;
+                myurl += "?" + getstring;
+            }
         }
+
+        curl_easy_setopt(curl, CURLOPT_URL, myurl.c_str());
 
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
