@@ -50,7 +50,8 @@ edit control file
 
 `nano control`
 
-```Source: iprefresher
+```
+Source: iprefresher
 Section: net
 Priority: optional
 Maintainer: Lukas Heiligenbrunner <lukas@unknown>
