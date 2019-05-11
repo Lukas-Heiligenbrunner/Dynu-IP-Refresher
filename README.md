@@ -1,7 +1,7 @@
 # DynuIPRefresher
 
 ## Build
-
+## Basic Build
 Download source files
 
 `git clone https://github.com/Lukas-Heiligenbrunner/DynuIPRefresher.git`
@@ -18,13 +18,16 @@ install it to the system
 
 `make install`
 
-### Create a Debian package
+### Build a Debian package
+Download source files
+
+`git clone https://github.com/Lukas-Heiligenbrunner/DynuIPRefresher.git`
 
 rename Project folder to lower case:
 
-`mv DynuIPRefresher iprefresher`
+`mv DynuIPRefresher iprefresher-1.0`
 
-`cd iprefresher`
+`cd iprefresher-1.0`
 
 pack source in a tar.gz archive
 
