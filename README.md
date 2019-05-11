@@ -2,7 +2,6 @@
 
 ## Build
 
-### Linux
 Download source files
 
 `git clone https://github.com/Lukas-Heiligenbrunner/DynuIPRefresher.git`
@@ -19,7 +18,7 @@ install it to the system
 
 `make install`
 
-#### Create a Debian package
+### Create a Debian package
 
 rename Project folder to lower case:
 
