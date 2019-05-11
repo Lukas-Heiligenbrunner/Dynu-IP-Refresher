@@ -51,6 +51,8 @@ remove useless files:
 
 edit control file
 
+`rm control`
+
 `nano control`
 
 ```
@@ -67,9 +69,10 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: a dynu.net ip refresher written in c++
  a dynu.net ip refresher written in c++
 ```
+return to main folder
+
+`cd ..`
 
 buld .deb package
-
-`dpkg-buildpackage -S -us -uc `
 
 `dpkg-buildpackage -us -uc `
