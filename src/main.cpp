@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <unordered_map>
 
 #include "api/API.h"
 #include "Logger.h"
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
 
         std::string ip = api.request("https://api.ipify.org");
 
-        if (ip == "") {
+        if (ip.empty()) {
             //no internet connection
             logger.logToLogfile("[WARNING] no internet connection");
             std::cout << "[WARNING] no internet connection" << std::endl;

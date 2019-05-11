@@ -21,14 +21,12 @@ std::string API::request(std::string myurl) {
 std::string
 API::request(std::string myurl, bool post, Hashmap<std::string, std::string> &map, std::vector<std::string> &headers) {
     CURL *curl;
-    CURLcode res;
-
 
     curl = curl_easy_init();
 
     struct curl_slist *list = nullptr;
     for (int j = 0; j < headers.size(); ++j) {
-        list = curl_slist_append(list, headers.at(j).c_str());
+        list = curl_slist_append(list, headers.at((unsigned long)(j)).c_str());
     }
 
     std::string readString;
@@ -73,7 +71,7 @@ API::request(std::string myurl, bool post, Hashmap<std::string, std::string> &ma
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readString);
 
-        res = curl_easy_perform(curl);
+        curl_easy_perform(curl);
 
         curl_easy_cleanup(curl);
     }
