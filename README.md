@@ -29,6 +29,10 @@ rename Project folder to lower case:
 
 `cd iprefresher-1.0`
 
+remove .idea folder because it´s useless in this case:
+
+`rm -Rf .idea`
+
 pack source in a tar.gz archive
 
 `tar -zcvf iprefresher-1.0.tar.gz *`
@@ -76,3 +80,6 @@ return to main folder
 buld .deb package
 
 `dpkg-buildpackage -us -uc `
+
+### Windows cross build
+TODO!
