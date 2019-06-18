@@ -5,6 +5,8 @@
 #include "api/API.h"
 #include "Logger.h"
 #include "api/TelegramAPI.h"
+#include "api/DynuAPI.h"
+#include "api/IPAPI.h"
 
 int main(int argc, char *argv[]) {
 
@@ -20,10 +22,10 @@ int main(int argc, char *argv[]) {
             std::cout << "wrong arguments!  -h for help" << std::endl;
         }
     } else {
-        API api;
         Logger logger;
 
-        std::string ip = api.request("https://api.ipify.org");
+        IPAPI ipapi;
+        std::string ip = ipapi.getGlobalIp();
 
         if (ip.empty()) {
             //no internet connection
@@ -39,29 +41,14 @@ int main(int argc, char *argv[]) {
                 logger.logToLogfile(" [INFO] ip changed! -- from :" + oldip + "to: " + ip);
                 std::cout << "[INFO] ip changed! -- from :" << oldip << "to: " << ip << std::endl;
 
-                static std::string dynuapikey = "88vNpMfDhMM2YYDNfWR1DNYfRX9W6fYg";
+                DynuAPI dynu;
+                TelegramAPI tele;
 
-                static std::string domainid = "8506047"; //id of the dynu domain
-                static std::string domainname = "luki.dynu.net";
-
-                Hashmap<std::string, std::string> args;
-                args.add("name", domainname);
-                args.add("ipv4Address", ip);
-
-                std::vector<std::string> headers;
-                headers.push_back("accept: application/json");
-                headers.push_back("User-Agent: Mozilla/5.0 (compatible; Rigor/1.0.0; http://rigor.com)");
-                headers.push_back("API-Key: " + dynuapikey);
-
-                std::string dynurepl = api.request("https://api.dynu.com/v2/dns/" + domainid, true, args, headers);
-
-                std::cout << "[DEBUG] api reply:: " << dynurepl << std::endl;
-
-                if (dynurepl != "{\"statusCode\":200}") {
-                    logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
-                } else {
-                    TelegramAPI tele;
+                if(dynu.refreshIp(ip)){
                     tele.sendMessage(oldip + " moved to " + ip);
+                } else{
+                    //error
+                    logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
                 }
 
                 logger.safeip(ip);

@@ -20,7 +20,9 @@ set(SOURCE
 
         src/api/TelegramAPI.cpp
         src/api/TelegramAPI.h
-        )
+
+        src/api/DynuAPI.cpp
+        src/api/DynuAPI.h src/api/IPAPI.cpp src/api/IPAPI.h)
 
 add_executable(iprefresher  ${SOURCE})
 target_link_libraries(iprefresher ${CURL_LIBRARIES})
