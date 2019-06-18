@@ -42,9 +42,9 @@ int main(int argc, char *argv[]) {
                 std::cout << "[INFO] ip changed! -- from :" << oldip << "to: " << ip << std::endl;
 
                 DynuAPI dynu;
-                TelegramAPI tele;
 
                 if(dynu.refreshIp(ip)){
+                    TelegramAPI tele;
                     tele.sendMessage(oldip + " moved to " + ip);
                 } else{
                     //error

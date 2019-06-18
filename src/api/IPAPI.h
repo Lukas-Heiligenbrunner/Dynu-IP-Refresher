@@ -12,7 +12,6 @@
 class IPAPI : API{
 public:
     std::string getGlobalIp();
-
 };
 
 

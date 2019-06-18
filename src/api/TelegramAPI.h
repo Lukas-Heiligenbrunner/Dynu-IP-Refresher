@@ -14,8 +14,8 @@ public:
     void sendMessage(std::string text);
 
 private:
-    std::string apikey = "717213769:AAHan1nSXhUsxLJAN1Dv8Oc0z8wqwDdYPn4";
-    std::string chatid = "618154204";
+    const std::string apikey = "717213769:AAHan1nSXhUsxLJAN1Dv8Oc0z8wqwDdYPn4";
+    const std::string chatid = "618154204";
 };
 
 
