@@ -3,6 +3,8 @@ project(iprefresher VERSION 1.0.1 DESCRIPTION "Dynu ip refresher")
 
 set(CMAKE_CXX_STANDARD 17)
 
+#set(CMAKE_BUILD_TYPE Release) # manually set build type
+
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR} inc)
 
