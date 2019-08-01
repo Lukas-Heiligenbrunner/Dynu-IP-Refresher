@@ -2,8 +2,7 @@
 // Created by lukas on 07.04.19.
 //
 
-#ifndef QT5PROJECT_HASHMAP_H
-#define QT5PROJECT_HASHMAP_H
+#pragma once
 
 
 #include <iostream>
@@ -12,12 +11,31 @@
 template<class keytype, class valuetype>
 class Hashmap {
 public:
+    /**
+     * add key-value pair to hashmap
+     * @param key keyvalue
+     * @param value valuevalue
+     */
     void add(keytype key, keytype value);
 
+    /**
+     * get key of specific position
+     * @param position int position
+     * @return responding key object
+     */
     keytype getKey(int position);
 
+    /**
+     * get value of specific position
+     * @param position int position
+     * @return responding value object
+     */
     valuetype getValue(int position);
 
+    /**
+     * get size of Hashmap
+     * @return size of Hashmap
+     */
     int size();
 
 private:
@@ -45,6 +63,3 @@ template<class keytype, class valuetype>
 int Hashmap<keytype, valuetype>::size() {
     return (int) (keys.size());
 }
-
-
-#endif //QT5PROJECT_HASHMAP_H

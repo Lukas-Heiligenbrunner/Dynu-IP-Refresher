@@ -2,7 +2,7 @@
 // Created by lukas on 08.05.19.
 //
 
-#include "TelegramAPI.h"
+#include "api/TelegramAPI.h"
 
 void TelegramAPI::sendMessage(std::string text) {
     Hashmap<std::string, std::string> args;

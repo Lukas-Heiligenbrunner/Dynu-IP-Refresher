@@ -2,8 +2,8 @@
 // Created by lukas on 06.04.19.
 //
 
-#include "API.h"
-#include "Hashmap.h"
+#include "api/API.h"
+#include "api/Hashmap.h"
 
 #include <string>
 #include <iostream>
