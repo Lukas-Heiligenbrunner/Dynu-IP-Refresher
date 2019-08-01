@@ -26,7 +26,7 @@ API::request(std::string myurl, bool post, Hashmap<std::string, std::string> &ma
 
     struct curl_slist *list = nullptr;
     for (int j = 0; j < headers.size(); ++j) {
-        list = curl_slist_append(list, headers.at((unsigned long)(j)).c_str());
+        list = curl_slist_append(list, headers.at((unsigned long) (j)).c_str());
     }
 
     std::string readString;

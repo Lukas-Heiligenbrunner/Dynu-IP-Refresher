@@ -43,7 +43,7 @@ valuetype Hashmap<keytype, valuetype>::getValue(int position) {
 
 template<class keytype, class valuetype>
 int Hashmap<keytype, valuetype>::size() {
-    return (int)(keys.size());
+    return (int) (keys.size());
 }
 
 

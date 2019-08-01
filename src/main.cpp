@@ -43,10 +43,10 @@ int main(int argc, char *argv[]) {
 
                 DynuAPI dynu;
 
-                if(dynu.refreshIp(ip)){
+                if (dynu.refreshIp(ip)) {
                     TelegramAPI tele;
                     tele.sendMessage(oldip + " moved to " + ip);
-                } else{
+                } else {
                     //error
                     logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
                 }
