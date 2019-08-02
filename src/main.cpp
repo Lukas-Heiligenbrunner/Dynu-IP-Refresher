@@ -1,12 +1,5 @@
 #include <iostream>
-#include <ctime>
-#include <unordered_map>
-
-#include "api/API.h"
-#include "Logger.h"
-#include "api/TelegramAPI.h"
-#include "api/DynuAPI.h"
-#include "api/IPAPI.h"
+#include <IPRefresher.h>
 
 int main(int argc, char *argv[]) {
 
@@ -22,38 +15,8 @@ int main(int argc, char *argv[]) {
             std::cout << "wrong arguments!  -h for help" << std::endl;
         }
     } else {
-        Logger logger;
-
-        IPAPI ipapi;
-        std::string ip = ipapi.getGlobalIp();
-
-        if (ip.empty()) {
-            //no internet connection
-            logger.logToLogfile("[WARNING] no internet connection");
-            std::cout << "[WARNING] no internet connection" << std::endl;
-        } else {
-            std::string oldip = logger.readip();
-
-            if (oldip == ip) {
-                std::cout << "[INFO] no change -- ip: " << ip << std::endl;
-                logger.logToLogfile(" [INFO] no change -- ip: " + ip);
-            } else {
-                logger.logToLogfile(" [INFO] ip changed! -- from :" + oldip + "to: " + ip);
-                std::cout << "[INFO] ip changed! -- from :" << oldip << "to: " << ip << std::endl;
-
-                DynuAPI dynu;
-
-                if (dynu.refreshIp(ip)) {
-                    TelegramAPI tele;
-                    tele.sendMessage(oldip + " moved to " + ip);
-                } else {
-                    //error
-                    logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
-                }
-
-                logger.safeip(ip);
-            }
-        }
+        IPRefresher ipr;
+        ipr.checkIPAdress();
     }
 
     return 0;

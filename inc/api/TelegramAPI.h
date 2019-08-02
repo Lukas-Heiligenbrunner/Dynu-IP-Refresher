@@ -16,7 +16,14 @@ public:
      */
     void sendMessage(std::string text);
 
+    /**
+     * init Telegram api with apikey and chatid
+     * @param apikey recieved API key
+     * @param chatid chatid where bot should post into
+     */
+    void init(std::string apikey, std::string chatid);
+
 private:
-    const std::string apikey = "717213769:AAHan1nSXhUsxLJAN1Dv8Oc0z8wqwDdYPn4";
-    const std::string chatid = "618154204";
+    std::string apikey;
+    std::string chatid;
 };

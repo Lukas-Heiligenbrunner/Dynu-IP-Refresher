@@ -14,3 +14,8 @@ void TelegramAPI::sendMessage(std::string text) {
     std::string reply = request("https://api.telegram.org/bot" + apikey + "/sendmessage", false, args, headers);
 //    std::cout << "[DEBUG] " << reply << std::endl;
 }
+
+void TelegramAPI::init(std::string apikey, std::string chatid) {
+    this->apikey = apikey;
+    this->chatid = chatid;
+}

@@ -26,7 +26,7 @@ add_library(logger
 
 set(SOURCE
         src/main.cpp
-        )
+        src/IPRefresher.cpp inc/IPRefresher.h)
 
 add_executable(iprefresher  ${SOURCE})
 
