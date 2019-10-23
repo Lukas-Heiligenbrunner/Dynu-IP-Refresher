@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.7)
-project(iprefresher VERSION 1.0.1 DESCRIPTION "Dynu ip refresher")
+cmake_minimum_required(VERSION 3.13)
+project(iprefresher VERSION 1.2.0 DESCRIPTION "Dynu ip refresher")
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -11,7 +11,6 @@ include_directories(${CURL_INCLUDE_DIR} inc)
 
 add_library(api ${libmethod}
         src/api/API.cpp
-
 
         src/api/TelegramAPI.cpp
 
@@ -52,6 +51,7 @@ IF (UNIX)
     if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "found rpm build executeable --> able to build rpm")
         set(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/lib/systemd/system" "/usr/lib/systemd") # --> needed to not override existing folders
     else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "not found rpm build tools --> not building rpm")
     endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
@@ -78,13 +78,12 @@ IF (UNIX)
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <ultimategameingcookie@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
 
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/lib/systemd/system" "/usr/lib/systemd")
     INCLUDE(CPack)
 
 
 ENDIF (UNIX)
-
-add_custom_target(build-linux-packages
+#todo all
+add_custom_target(build-linux-packages ALL
         "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
         DEPENDS ${PROJECT_NAME}
         COMMENT "Installing ${PROJECT_NAME}")
