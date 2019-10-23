@@ -8,9 +8,13 @@
 #include <api/IPAPI.h>
 #include <api/DynuAPI.h>
 #include <api/TelegramAPI.h>
+
+#include <chrono>
+#include <thread>
+
 #include "IPRefresher.h"
 
-void IPRefresher::checkIPAdress() {
+void IPRefresher::checkIPAdress(bool force) {
     Logger logger;
 
     IPAPI ipapi;
@@ -23,7 +27,7 @@ void IPRefresher::checkIPAdress() {
     } else {
         std::string oldip = logger.readip();
 
-        if (oldip == ip) {
+    if (oldip == ip && !force) {
             std::cout << "[INFO] no change -- ip: " << ip << std::endl;
             logger.logToLogfile(" [INFO] no change -- ip: " + ip);
         } else {
@@ -43,5 +47,16 @@ void IPRefresher::checkIPAdress() {
 
             logger.safeip(ip);
         }
+    }
+}
+
+IPRefresher::IPRefresher() {
+
+}
+
+IPRefresher::IPRefresher(bool loop) {
+    while(true){
+        std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+        checkIPAdress(false);
     }
 }

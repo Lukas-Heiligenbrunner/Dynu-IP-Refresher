@@ -10,5 +10,8 @@ public:
     /**
      * refresh ip address on Dynu server
      */
-    void checkIPAdress();
+    void checkIPAdress(bool force);
+
+    IPRefresher();
+    IPRefresher(bool loop);
 };
