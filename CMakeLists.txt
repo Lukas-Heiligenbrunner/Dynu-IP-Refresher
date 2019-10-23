@@ -3,12 +3,13 @@ project(iprefresher VERSION 1.0.1 DESCRIPTION "Dynu ip refresher")
 
 set(CMAKE_CXX_STANDARD 17)
 
-#set(CMAKE_BUILD_TYPE Release) # manually set build type
+set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
+set(libmethod STATIC) #SHARED / STATIC
 
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR} inc)
 
-add_library(api
+add_library(api ${libmethod}
         src/api/API.cpp
 
 
@@ -19,7 +20,7 @@ add_library(api
         src/api/IPAPI.cpp
         )
 
-add_library(logger
+add_library(logger ${libmethod}
         src/Logger.cpp
         )
 
@@ -35,15 +36,27 @@ target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} )
 
 # INSTALL to SYSTEM #
 install (TARGETS iprefresher DESTINATION bin)
-install(FILES ./iprefresher.service DESTINATION /lib/systemd/system/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION lib/systemd/system)
 
 SET(CPACK_DEB_COMPONENT_INSTALL 1)
 
 IF (UNIX)
+    FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
+
+    SET(CPACK_GENERATOR "TGZ;TBZ2;DEB")
+
+    #check if rpm build is possible
+    if(NOT ${RPMBUILD_EXECUTABLE} STREQUAL "")
+        message(STATUS "found rpm build executeable --> able to build rpm")
+        set(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
+    endif(NOT ${RPMBUILD_EXECUTABLE} STREQUAL "")
+
+
+
 
     SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
     SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2")
-    SET(CPACK_GENERATOR "TGZ;TBZ2;DEB;RPM")
+
     SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
     SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
@@ -53,7 +66,13 @@ IF (UNIX)
     SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}")
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <ultimategameingcookie@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
+
+    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/lib/systemd/system" "/usr/lib/systemd")
     INCLUDE(CPack)
+
+
+
+
 
 ENDIF (UNIX)
 
