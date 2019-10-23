@@ -1,0 +1,12 @@
+[Unit]
+Description=IP Refresher
+After=network.target
+[Service]
+ExecStart=iprefresher -l
+WorkingDirectory=/root
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+[Install]
+WantedBy=multi-user.target

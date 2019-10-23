@@ -35,6 +35,7 @@ target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} )
 
 # INSTALL to SYSTEM #
 install (TARGETS iprefresher DESTINATION bin)
+install(FILES ./iprefresher.service DESTINATION /lib/systemd/system/)
 
 SET(CPACK_DEB_COMPONENT_INSTALL 1)
 
