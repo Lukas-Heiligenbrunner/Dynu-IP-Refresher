@@ -29,29 +29,40 @@ set(SOURCE
         src/main.cpp
         src/IPRefresher.cpp inc/IPRefresher.h)
 
-add_executable(iprefresher  ${SOURCE})
+add_executable(iprefresher ${SOURCE})
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} )
+target_link_libraries(iprefresher api logger ${CURL_LIBRARIES})
 
 # INSTALL to SYSTEM #
-install (TARGETS iprefresher DESTINATION bin)
+install(TARGETS iprefresher DESTINATION bin)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION lib/systemd/system)
 
 SET(CPACK_DEB_COMPONENT_INSTALL 1)
 
 IF (UNIX)
     FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
+    FIND_PROGRAM(DEB_EXECUTABLE dpkg)
 
-    SET(CPACK_GENERATOR "TGZ;TBZ2;DEB")
+    message(STATUS ${DEB_EXECUTABLE})
+
+    SET(CPACK_GENERATOR "TGZ;TBZ2")
 
     #check if rpm build is possible
-    if(NOT ${RPMBUILD_EXECUTABLE} STREQUAL "")
+    if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "found rpm build executeable --> able to build rpm")
         set(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-    endif(NOT ${RPMBUILD_EXECUTABLE} STREQUAL "")
+    else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
+        message(STATUS "not found rpm build tools --> not building rpm")
+    endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
 
-
+    #check if deb build is possible
+    if (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
+        message(STATUS "found deb build tools --> able to build deb")
+        set(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
+    else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
+        message(STATUS "not found  deb build tools --> not building deb")
+    endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
 
 
     SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
@@ -69,9 +80,6 @@ IF (UNIX)
 
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/lib/systemd/system" "/usr/lib/systemd")
     INCLUDE(CPack)
-
-
-
 
 
 ENDIF (UNIX)
