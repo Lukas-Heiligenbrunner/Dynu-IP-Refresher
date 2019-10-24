@@ -43,8 +43,6 @@ IF (UNIX)
     FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
     FIND_PROGRAM(DEB_EXECUTABLE dpkg)
 
-    message(STATUS ${DEB_EXECUTABLE})
-
     SET(CPACK_GENERATOR "TGZ;TBZ2")
 
     #check if rpm build is possible
@@ -83,7 +81,7 @@ IF (UNIX)
 
 ENDIF (UNIX)
 #todo all
-add_custom_target(build-linux-packages ALL
+add_custom_target(build-linux-packages
         "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
         DEPENDS ${PROJECT_NAME}
         COMMENT "Installing ${PROJECT_NAME}")
