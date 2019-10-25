@@ -5,21 +5,55 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(libmethod STATIC) #SHARED / STATIC
-set(WinBuild false)
+set(WinBuild true)
 
-if (NOT ${WinBuild})
-else()
+#set up toolchain
+
+if (${WinBuild})
+    set(LIBSUFFIX .dll)
+    set(SUFFIX .exe)
+
+    set(CMAKE_SYSTEM_NAME Windows)
+    set(TOOLCHAIN_PREFIX x86_64-w64-mingw32)
+    #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
+
+    # cross compilers to use for C and C++
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
+
+    # target environment on the build host system
+    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw /usr/lib/gcc/${TOOLCHAIN_PREFIX}/8.3.0)
+
+
+    # modify default behavior of FIND_XXX() commands to
+    # search for headers/libs in the target environment and
+    # search for programs in the build host environment
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+    #    set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -std=c++11 -static -DCURL_STATICLIB)
+    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -lcurl -lpthread -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -Wl,-Bstatic,--whole-archive -Wl,--no-whole-archive")
+    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
+    add_definitions(-DCURL_STATICLIB)
+else ()
+    set(LIBSUFFIX .so)
+    set(SUFFIX "")
 endif ()
 
+
 find_package(CURL REQUIRED)
-if(CURL_FOUND)
+if (CURL_FOUND)
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
     #        include_directories(${CURL_INCLUDE_DIRS})
-else()
+else ()
     message(FATAL_ERROR "Could not find CURLLL")
-endif()
+endif ()
 include_directories(${CURL_INCLUDE_DIR} inc)
 
 add_library(api ${libmethod}
@@ -50,9 +84,10 @@ target_link_libraries(iprefresher api logger ${CURL_LIBRARIES})
 install(TARGETS iprefresher DESTINATION bin)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION lib/systemd/system)
 
-SET(CPACK_DEB_COMPONENT_INSTALL 1)
 
 IF (UNIX)
+    SET(CPACK_DEB_COMPONENT_INSTALL 1)
+
     FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
     FIND_PROGRAM(DEB_EXECUTABLE dpkg)
 
@@ -97,74 +132,3 @@ IF (UNIX)
             COMMENT "Installing ${PROJECT_NAME}")
 
 ENDIF (UNIX)
-
-
-
-#todooooooo
-
-
-
-cmake_minimum_required(VERSION 3.14)
-project(crosscompiletest)
-
-set(CMAKE_CXX_STANDARD 14)
-
-set(WinBuild true)
-
-if (${WinBuild})
-    set(LIBSUFFIX .dll)
-    set(SUFFIX .exe)
-else()
-    set(LIBSUFFIX .so)
-    set(SUFFIX "")
-endif ()
-
-if (${WinBuild})
-    set(CMAKE_SYSTEM_NAME Windows)
-    set(TOOLCHAIN_PREFIX x86_64-w64-mingw32)
-    #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
-
-    # cross compilers to use for C and C++
-    #set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
-    #set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
-    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
-    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
-
-    # target environment on the build host system
-    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX} /usr/lib/gcc/${TOOLCHAIN_PREFIX}/8.3.0)
-
-
-    # modify default behavior of FIND_XXX() commands to
-    # search for headers/libs in the target environment and
-    # search for programs in the build host environment
-    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
-    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++ -lpthread -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic,--whole-archive -Wl,--no-whole-archive")
-
-endif ()
-
-
-find_package(CURL REQUIRED)
-if(CURL_FOUND)
-    message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
-    message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
-    message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
-    #        include_directories(${CURL_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Could not find CURLLL")
-endif()
-
-
-add_library(testlib SHARED testlibrary.cpp testlibrary.h)
-set_target_properties(testlib PROPERTIES SUFFIX ${LIBSUFFIX})
-
-
-add_executable(crosscompiletest main.cpp )
-set_target_properties(crosscompiletest PROPERTIES SUFFIX ${SUFFIX})
-
-target_link_libraries(crosscompiletest testlib)
-
