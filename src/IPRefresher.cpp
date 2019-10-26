@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include <Logger.h>
+#include <FileLogger.h>
 #include <api/IPAPI.h>
 #include <api/DynuAPI.h>
 #include <api/TelegramAPI.h>
@@ -12,10 +12,10 @@
 #include <chrono>
 #include <thread>
 
-#include "IPRefresher.h"
+#include <IPRefresher.h>
 
 void IPRefresher::checkIPAdress(bool force) {
-    Logger logger;
+    FileLogger logger;
 
     IPAPI ipapi;
     std::string ip = ipapi.getGlobalIp();
@@ -55,8 +55,10 @@ IPRefresher::IPRefresher() {
 }
 
 IPRefresher::IPRefresher(bool loop) {
+    std::cout << "[INFO] startup of service" << std::endl;
     while(true){
-        std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+        std::cout << "[INFO] starting check" << std::endl;
         checkIPAdress(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(300000));
     }
 }

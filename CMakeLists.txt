@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
-project(iprefresher VERSION 1.2.0 DESCRIPTION "Dynu ip refresher")
+project(iprefresher DESCRIPTION "Dynu ip refresher")
 
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(libmethod STATIC) #SHARED / STATIC
 set(WinBuild false)
+set(PROJECT_VERSION 1.2.1)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -60,6 +61,11 @@ else ()
 endif ()
 include_directories(${CURL_INCLUDE_DIR} inc)
 
+#add version header
+FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
+        "\#pragma once\nclass Version {\npublic:\n  static const std::string VERSION;\n};\n\n std::string const Version::VERSION = \"${PROJECT_VERSION}\";"
+        )
+
 add_library(api ${libmethod}
         src/api/API.cpp
 
@@ -71,13 +77,15 @@ add_library(api ${libmethod}
         )
 
 add_library(logger ${libmethod}
+        src/FileLogger.cpp
         src/Logger.cpp
         )
 
 
 set(SOURCE
         src/main.cpp
-        src/IPRefresher.cpp inc/IPRefresher.h)
+        src/IPRefresher.cpp
+        )
 
 add_executable(iprefresher ${SOURCE})
 
@@ -124,8 +132,9 @@ IF (UNIX)
     SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
     SET(CPACK_PACKAGE_VERSION_MAJOR "1")
     SET(CPACK_PACKAGE_VERSION_MINOR "2")
-    SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
-    SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}")
+    set(CPACK_PACKAGE_VERSION_PATCH "1")
+    SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <ultimategameingcookie@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
     set(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1)")

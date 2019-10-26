@@ -1,27 +1,22 @@
 //
-// Created by lukas on 05.05.19.
+// Created by lukas on 26.10.19.
 //
+
 #pragma once
 
 #include <string>
+
 class Logger {
 public:
-    /**
-     * log messages to logfile
-     * @param text message
-     */
-    void logToLogfile(std::string text);
+    static void debug(std::string message);
+    static void message(std::string message);
+    static void warning(std::string message);
+    static void error(std::string message);
 
-    /**
-     * safe ip to temp file
-     * @param ip ip address to save
-     */
-    void safeip(std::string ip);
+    static void log(std::string message, int level);
 
-    /**
-     * read ip from file
-     * @return read ip
-     */
-    std::string readip();
-
+    static const int Debug;
+    static const int Message;
+    static const int Warning;
+    static const int Error;
 };

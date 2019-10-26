@@ -1,8 +1,9 @@
 #include <iostream>
 #include <IPRefresher.h>
+#include <Version.h>
+#include <Logger.h>
 
 int main(int argc, char *argv[]) {
-
     if (argc > 1) {
         std::string firstarg(argv[1]);
         if (firstarg == "-h" || firstarg == "--help") {
@@ -12,18 +13,18 @@ int main(int argc, char *argv[]) {
                       << "[-l] [--loop] infinite loop to refresh ip every five minutes" << std::endl
                       << "[no argument] normal ip check and refresh" << std::endl;
         } else if (firstarg == "-v" || firstarg == "--version") {
-            std::cout << "Version 1.2" << std::endl;
+            Logger::message("Version "+Version::VERSION);
         } else if (firstarg == "-f" || firstarg == "--force") {
             IPRefresher ipr;
             ipr.checkIPAdress(true);
         } else if (firstarg == "-l" || firstarg == "--loop") {
             IPRefresher ipr(true);
-            ipr.checkIPAdress(false);
         } else {
-            std::cout << "wrong arguments!  -h for help" << std::endl;
+            Logger::message("wrong arguments!  -h for help");
         }
     } else {
         IPRefresher ipr;
+        Logger::message("starting check");
         ipr.checkIPAdress(false);
 
     }

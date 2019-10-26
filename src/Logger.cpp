@@ -1,49 +1,55 @@
 //
-// Created by lukas on 05.05.19.
+// Created by lukas on 26.10.19.
 //
 
-#include <fstream>
-#include <ctime>
-#include <iostream>
 #include <sstream>
+#include <iostream>
 
 #include "Logger.h"
 
-void Logger::safeip(std::string ip) {
-    std::ofstream out;
-    out.open("ip.txt", std::ios::out);
 
-    out << ip;
 
-    out.close();
+
+const int Logger::Warning = 1;
+const int Logger::Debug = 2;
+const int Logger::Message = 3;
+const int Logger::Error = 4;
+
+void Logger::debug(std::string message) {
+    log(message,Logger::Debug);
 }
 
-std::string Logger::readip() {
-    std::ifstream in;
-    in.open("ip.txt", std::ios::in);
-
-    std::string ip;
-
-    in >> ip;
-
-    return ip;
+void Logger::message(std::string message) {
+    log(message,Logger::Message);
 }
 
-void Logger::logToLogfile(std::string text) {
-    std::ofstream out;
-    out.open("dynurefresher.log", std::ios::out | std::ios::app);
-
-
-    std::time_t t = std::time(0);   // get time now
-    std::tm *now = std::localtime(&t);
-
-    std::stringstream logline;
-
-    logline << "[ " << (now->tm_year + 1900) << '-' << (now->tm_mon + 1) << '-' << now->tm_mday
-            << "_" << now->tm_hour << ":" << now->tm_min << ":" << now->tm_sec << " ] " << '\t' << text << std::endl;
-
-
-    out << logline.str();
-
-    out.close();
+void Logger::warning(std::string message) {
+    log(message,Logger::Warning);
 }
+
+void Logger::error(std::string message) {
+    log(message,Logger::Error);
+}
+
+void Logger::log(std::string message, int level) {
+    std::stringstream out;
+    out << "[";
+    switch (level){
+        case Debug:
+            out << "DEBUG";
+            break;
+        case Message:
+            out << "MESSAGE";
+            break;
+        case Warning:
+            out << "WARNING";
+            break;
+        case Error:
+            out << "ERROR";
+            break;
+    }
+    out << "] ";
+    out << message;
+    std::cout << out.str() << std::endl;
+}
+
