@@ -128,6 +128,7 @@ IF (UNIX)
     SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}")
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <ultimategameingcookie@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
+    set(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1)")
 
     INCLUDE(CPack)
 
