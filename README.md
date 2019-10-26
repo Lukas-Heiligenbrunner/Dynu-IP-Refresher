@@ -17,6 +17,11 @@ Debian:
 Fedora:
 `dnf install libcurl-devel`
 
+#### dependencies for package build
+`dpkg` --> debian/ubuntu package
+
+`rpmbuild` --> Fedora/RedHat/CentOS package
+
 ### cmake project
 cd into downloaded files and Generate makefiles:
 
