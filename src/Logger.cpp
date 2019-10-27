@@ -8,33 +8,31 @@
 #include "Logger.h"
 
 
-
-
 const int Logger::Warning = 1;
 const int Logger::Debug = 2;
 const int Logger::Message = 3;
 const int Logger::Error = 4;
 
 void Logger::debug(std::string message) {
-    log(message,Logger::Debug);
+    log(message, Logger::Debug);
 }
 
 void Logger::message(std::string message) {
-    log(message,Logger::Message);
+    log(message, Logger::Message);
 }
 
 void Logger::warning(std::string message) {
-    log(message,Logger::Warning);
+    log(message, Logger::Warning);
 }
 
 void Logger::error(std::string message) {
-    log(message,Logger::Error);
+    log(message, Logger::Error);
 }
 
 void Logger::log(std::string message, int level) {
     std::stringstream out;
     out << "[";
-    switch (level){
+    switch (level) {
         case Debug:
             out << "DEBUG";
             break;

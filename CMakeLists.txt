@@ -4,14 +4,14 @@ project(iprefresher DESCRIPTION "Dynu ip refresher")
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
-set(libmethod STATIC) #SHARED / STATIC
+set(LIB_METHOD STATIC) #SHARED / STATIC
 set(WinBuild false)
 set(PROJECT_VERSION 1.2.1)
+option(BUILD_DOC "Build documentation" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 #set up toolchain
 
 if (${WinBuild})
@@ -66,7 +66,7 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
         "\#pragma once\nclass Version {\npublic:\n  static const std::string VERSION;\n};\n\n std::string const Version::VERSION = \"${PROJECT_VERSION}\";"
         )
 
-add_library(api ${libmethod}
+add_library(api ${LIB_METHOD}
         src/api/API.cpp
 
         src/api/TelegramAPI.cpp
@@ -76,7 +76,7 @@ add_library(api ${libmethod}
         src/api/IPAPI.cpp
         )
 
-add_library(logger ${libmethod}
+add_library(logger ${LIB_METHOD}
         src/FileLogger.cpp
         src/Logger.cpp
         )
@@ -147,3 +147,29 @@ IF (UNIX)
             COMMENT "Installing ${PROJECT_NAME}")
 
 ENDIF (UNIX)
+
+# check if Doxygen is installed
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    if (BUILD_DOC)
+        # set input and output files
+        set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+        set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+        # request to configure the file
+        configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+        message(STATUS "Doxygen build started")
+
+        # note the option ALL which allows to build the docs together with the application
+        add_custom_target(doc_doxygen ALL
+                COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                COMMENT "Generating API documentation with Doxygen"
+                VERBATIM)
+    else (BUILD_DOC)
+        message(STATUS "do not build docu")
+    endif (BUILD_DOC)
+
+else (DOXYGEN_FOUND)
+    message(STATUS "Doxygen need to be installed to generate the doxygen documentation")
+endif (DOXYGEN_FOUND)

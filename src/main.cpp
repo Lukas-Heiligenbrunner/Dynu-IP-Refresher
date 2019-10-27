@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
                       << "[-l] [--loop] infinite loop to refresh ip every five minutes" << std::endl
                       << "[no argument] normal ip check and refresh" << std::endl;
         } else if (firstarg == "-v" || firstarg == "--version") {
-            Logger::message("Version "+Version::VERSION);
+            std::cout << "Version " << Version::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
             IPRefresher ipr;
             ipr.checkIPAdress(true);
