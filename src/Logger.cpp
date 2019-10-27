@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <libconfig.h>
 
 #include "Logger.h"
 
@@ -29,7 +30,7 @@ void Logger::error(std::string message) {
     log(message, Logger::Error);
 }
 
-void Logger::log(std::string message, int level) {
+void Logger::log(std::string &message, int level) {
     std::stringstream out;
     out << "[";
     switch (level) {

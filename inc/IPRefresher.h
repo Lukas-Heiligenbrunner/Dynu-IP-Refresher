@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 class IPRefresher {
 public:
     /**
@@ -13,5 +12,5 @@ public:
     void checkIPAdress(bool force);
 
     IPRefresher();
-    IPRefresher(bool loop);
+    explicit IPRefresher(bool loop);
 };

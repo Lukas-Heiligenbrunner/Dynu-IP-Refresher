@@ -49,16 +49,17 @@ else ()
     set(SUFFIX "")
 endif ()
 
-
+#config libs
+message(STATUS "Config of Libraries")
 find_package(CURL REQUIRED)
 if (CURL_FOUND)
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
-    #        include_directories(${CURL_INCLUDE_DIRS})
 else ()
-    message(FATAL_ERROR "Could not find CURLLL")
+    message(FATAL_ERROR "Could not find CURL")
 endif ()
+message("")
 include_directories(${CURL_INCLUDE_DIR} inc)
 
 #add version header
@@ -98,6 +99,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION /lib/s
 
 
 IF (UNIX)
+    message(STATUS "config of Package build")
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
     SET(CPACK_OUTPUT_FILE_PREFIX packages)
 
@@ -145,20 +147,21 @@ IF (UNIX)
             "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
             DEPENDS ${PROJECT_NAME}
             COMMENT "Installing ${PROJECT_NAME}")
-
+message("")
 ENDIF (UNIX)
 
 # check if Doxygen is installed
-find_package(Doxygen)
-if (DOXYGEN_FOUND)
-    if (BUILD_DOC)
+
+if (BUILD_DOC)
+    message(STATUS "config of DOxygen build")
+    find_package(Doxygen)
+    if (DOXYGEN_FOUND)
         # set input and output files
         set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
         set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
         # request to configure the file
         configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-        message(STATUS "Doxygen build started")
 
         # note the option ALL which allows to build the docs together with the application
         add_custom_target(doc_doxygen ALL
@@ -166,10 +169,10 @@ if (DOXYGEN_FOUND)
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                 COMMENT "Generating API documentation with Doxygen"
                 VERBATIM)
-    else (BUILD_DOC)
-        message(STATUS "do not build docu")
-    endif (BUILD_DOC)
+        message(STATUS "Successfully configured doxygen")
 
-else (DOXYGEN_FOUND)
-    message(STATUS "Doxygen need to be installed to generate the doxygen documentation")
-endif (DOXYGEN_FOUND)
+    else (DOXYGEN_FOUND)
+        message(STATUS "Doxygen need to be installed to generate the doxygen documentation")
+    endif (DOXYGEN_FOUND)
+    message("")
+endif (BUILD_DOC)
