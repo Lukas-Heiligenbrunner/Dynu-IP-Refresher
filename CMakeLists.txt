@@ -112,7 +112,7 @@ IF (UNIX)
     if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "found rpm build executeable --> able to build rpm")
         set(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd") # --> needed to not override existing folders
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib") # --> needed to not override existing folders
     else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "not found rpm build tools --> not building rpm")
     endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
