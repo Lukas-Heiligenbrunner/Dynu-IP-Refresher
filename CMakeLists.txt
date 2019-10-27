@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
-set(WinBuild false)
+set(WinBuild true)
 set(PROJECT_VERSION 1.2.1)
 option(BUILD_DOC "Build documentation" ON)
 
@@ -28,22 +28,22 @@ if (${WinBuild})
     set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
 
     # target environment on the build host system
-    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw /usr/lib/gcc/${TOOLCHAIN_PREFIX}/8.3.0)
+    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX} /usr/lib/gcc/${TOOLCHAIN_PREFIX}/9.2.1)
 
 
     # modify default behavior of FIND_XXX() commands to
     # search for headers/libs in the target environment and
     # search for programs in the build host environment
-    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
     set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
     set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
     #    set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -std=c++11 -static -DCURL_STATICLIB)
-    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -lcurl -lpthread -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -Wl,-Bstatic,--whole-archive -Wl,--no-whole-archive")
+#    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -DCURL_STATICLIB -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DCURL_STATICLIB -static -lpthread")
     #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
-    add_definitions(-DCURL_STATICLIB)
+    #add_definitions(-DCURL_STATICLIB)
 else ()
     set(LIBSUFFIX .so)
     set(SUFFIX "")
@@ -91,7 +91,7 @@ set(SOURCE
 add_executable(iprefresher ${SOURCE})
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher api logger ${CURL_LIBRARIES})
+target_link_libraries(iprefresher api logger /usr/x86_64-w64-mingw32/sys-root/mingw/bin/)
 
 # INSTALL to SYSTEM #
 install(TARGETS iprefresher DESTINATION bin)

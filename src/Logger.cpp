@@ -4,7 +4,6 @@
 
 #include <sstream>
 #include <iostream>
-#include <libconfig.h>
 
 #include "Logger.h"
 
