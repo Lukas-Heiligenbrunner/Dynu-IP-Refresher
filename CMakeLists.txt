@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
-set(WinBuild true)
+set(WinBuild false)
 set(PROJECT_VERSION 1.2.1)
 option(BUILD_DOC "Build documentation" ON)
 
@@ -91,7 +91,7 @@ set(SOURCE
 add_executable(iprefresher ${SOURCE})
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher api logger /usr/x86_64-w64-mingw32/sys-root/mingw/bin/)
+target_link_libraries(iprefresher api logger ${CURL_LIBRARIES})
 
 # INSTALL to SYSTEM #
 install(TARGETS iprefresher DESTINATION bin)
