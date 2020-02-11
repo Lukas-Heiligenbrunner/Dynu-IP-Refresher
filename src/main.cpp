@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
             IPRefresher ipr;
             ipr.checkIPAdress(true);
         } else if (firstarg == "-l" || firstarg == "--loop") {
-            IPRefresher ipr(true);
+            IPRefresher(true);
         } else {
             Logger::message("wrong arguments!  -h for help");
         }
