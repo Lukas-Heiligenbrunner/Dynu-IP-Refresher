@@ -86,7 +86,7 @@ add_library(logger ${LIB_METHOD}
 set(SOURCE
         src/main.cpp
         src/IPRefresher.cpp
-        )
+        src/Credentials.cpp)
 
 add_executable(iprefresher ${SOURCE})
 
