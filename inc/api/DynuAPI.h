@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 #include "API.h"
 
 class DynuAPI : API{
@@ -15,9 +14,17 @@ public:
      * @return request status
      */
     int refreshIp(std::string ip);
-private:
-    const std::string dynuapikey = "88vNpMfDhMM2YYDNfWR1DNYfRX9W6fYg";
 
-    const std::string domainid = "8506047"; //id of the dynu domain
-    const std::string domainname = "luki.dynu.net";
+    /**
+     * init Telegram api with apikey and chatid
+     * @param dynuApiKey Dynu Api key
+     * @param domainId ID of domain received by Dynu
+     * @param domainName domainname to refresh
+     */
+    void init(std::string dynuApiKey, std::string domainId, std::string domainName);
+private:
+    std::string dynuapikey;
+
+    std::string domainid; //id of the dynu domain
+    std::string domainname;
 };

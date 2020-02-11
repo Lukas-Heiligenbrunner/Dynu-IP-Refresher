@@ -25,3 +25,9 @@ int DynuAPI::refreshIp(std:: string ip) {
         return 1;
     }
 }
+
+void DynuAPI::init(std::string dynuApiKey, std::string domainId, std::string domainName) {
+    this->dynuapikey=dynuApiKey;
+    this->domainid=domainId;
+    this->domainname=domainName;
+}

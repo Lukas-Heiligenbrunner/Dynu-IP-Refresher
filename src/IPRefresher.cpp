@@ -14,6 +14,7 @@
 #include <Logger.h>
 
 #include <IPRefresher.h>
+#include <Credentials.h>
 
 void IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
@@ -36,10 +37,11 @@ void IPRefresher::checkIPAdress(bool force) {
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
             DynuAPI dynu;
+            dynu.init(Credentials::dynuapikey,Credentials::domainid,Credentials::domainname);
 
             if (dynu.refreshIp(ip)) {
                 TelegramAPI tele;
-                tele.init("717213769:AAHan1nSXhUsxLJAN1Dv8Oc0z8wqwDdYPn4", "618154204");
+                tele.init(Credentials::telegramApiKey, Credentials::chatId);
                 tele.sendMessage(oldip + " moved to " + ip);
             } else {
                 //error

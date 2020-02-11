@@ -2,8 +2,10 @@
 #include <IPRefresher.h>
 #include <Version.h>
 #include <Logger.h>
+#include <Credentials.h>
 
 int main(int argc, char *argv[]) {
+    if(!Credentials::checkCredentialValidity()) return -1;
     if (argc > 1) {
         std::string firstarg(argv[1]);
         if (firstarg == "-h" || firstarg == "--help") {
