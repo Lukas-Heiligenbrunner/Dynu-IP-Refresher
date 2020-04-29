@@ -16,7 +16,7 @@ public:
     static std::string telegramApiKey;
     static std::string chatId;
 
-    static bool checkCredentialValidity();
+    static bool readCredentials();
 
 private:
 };

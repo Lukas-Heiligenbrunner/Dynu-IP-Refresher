@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
 set(WinBuild false)
-set(PROJECT_VERSION 1.2.2)
+set(PROJECT_VERSION 1.2.3)
 option(BUILD_DOC "Build documentation" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -59,8 +59,31 @@ if (CURL_FOUND)
 else ()
     message(FATAL_ERROR "Could not find CURL")
 endif ()
-message("")
 include_directories(${CURL_INCLUDE_DIR} inc)
+
+# libconfig
+FIND_PATH(CONFIG++_INCLUDE_DIR libconfig.h++ /usr/include /usr/local/include)
+
+FIND_LIBRARY(CONFIG++_LIBRARY NAMES config++ PATH /usr/lib /usr/local/lib)
+
+IF (CONFIG++_INCLUDE_DIR AND CONFIG++_LIBRARY)
+    SET(CONFIG++_FOUND TRUE)
+ENDIF ( CONFIG++_INCLUDE_DIR AND CONFIG++_LIBRARY)
+
+IF (CONFIG++_FOUND)
+    MESSAGE(STATUS "Found Config++: ${CONFIG++_LIBRARY}")
+ELSE(CONFIG++_FOUND)
+    IF (Config++_FIND_REQUIRED)
+        IF(NOT CONFIG++_INCLUDE_DIR)
+            MESSAGE(FATAL_ERROR "Could not find LibConfig++ header file!")
+        ENDIF(NOT CONFIG++_INCLUDE_DIR)
+
+        IF(NOT CONFIG++_LIBRARY)
+            MESSAGE(FATAL_ERROR "Could not find LibConfig++ library file!")
+        ENDIF(NOT CONFIG++_LIBRARY)
+    ENDIF (Config++_FIND_REQUIRED)
+ENDIF (CONFIG++_FOUND)
+message("")
 
 #add version header
 FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
@@ -91,12 +114,13 @@ set(SOURCE
 add_executable(iprefresher ${SOURCE})
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher api logger ${CURL_LIBRARIES})
+target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} config++)
 
 # INSTALL to SYSTEM #
 set(CMAKE_INSTALL_PREFIX "/")
 install(TARGETS iprefresher DESTINATION usr/local/bin)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION lib/systemd/system)
+install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+install(FILES config/iprefresher.cfg DESTINATION etc)
 
 
 IF (UNIX)

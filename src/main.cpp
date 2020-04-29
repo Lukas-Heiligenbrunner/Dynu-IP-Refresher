@@ -5,7 +5,7 @@
 #include <Credentials.h>
 
 int main(int argc, char *argv[]) {
-    if (!Credentials::checkCredentialValidity()) {
+    if (!Credentials::readCredentials()) {
         std::cout << "incorrect credentials!" << std::endl;
         return -1;
     }
