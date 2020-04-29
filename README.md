@@ -1,4 +1,5 @@
 # DynuIPRefresher
+A lightweight C++ application to setup a service for refreshing a dynamic IP to the Dynu servers. 
 
 ## Build
 ## Basic Build
