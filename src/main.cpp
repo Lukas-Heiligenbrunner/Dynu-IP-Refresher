@@ -5,7 +5,10 @@
 #include <Credentials.h>
 
 int main(int argc, char *argv[]) {
-    if(!Credentials::checkCredentialValidity()) return -1;
+    if (!Credentials::checkCredentialValidity()) {
+        std::cout << "incorrect credentials!" << std::endl;
+        return -1;
+    }
     if (argc > 1) {
         std::string firstarg(argv[1]);
         if (firstarg == "-h" || firstarg == "--help") {
@@ -28,7 +31,6 @@ int main(int argc, char *argv[]) {
         IPRefresher ipr;
         Logger::message("starting check");
         ipr.checkIPAdress(false);
-
     }
 
     return 0;

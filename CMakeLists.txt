@@ -39,7 +39,7 @@ if (${WinBuild})
     set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
     #    set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -std=c++11 -static -DCURL_STATICLIB)
-#    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -DCURL_STATICLIB -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
+    #    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -DCURL_STATICLIB -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DCURL_STATICLIB -static -lpthread")
     #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
@@ -64,7 +64,7 @@ include_directories(${CURL_INCLUDE_DIR} inc)
 
 #add version header
 FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
-        "\#pragma once\nclass Version {\npublic:\n  static const std::string VERSION;\n};\n\n std::string const Version::VERSION = \"${PROJECT_VERSION}\";"
+        "\#pragma once\nclass Version {\npublic:\n  static const std::string VERSION;\n};\n\nstd::string const Version::VERSION = \"${PROJECT_VERSION}\";"
         )
 
 add_library(api ${LIB_METHOD}
@@ -94,14 +94,16 @@ add_executable(iprefresher ${SOURCE})
 target_link_libraries(iprefresher api logger ${CURL_LIBRARIES})
 
 # INSTALL to SYSTEM #
-install(TARGETS iprefresher DESTINATION bin)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION /lib/systemd/system)
+set(CMAKE_INSTALL_PREFIX "/")
+install(TARGETS iprefresher DESTINATION usr/local/bin)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/iprefresher.service DESTINATION lib/systemd/system)
 
 
 IF (UNIX)
     message(STATUS "config of Package build")
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
     SET(CPACK_OUTPUT_FILE_PREFIX packages)
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/") # no prefix for package structure
 
     FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
     FIND_PROGRAM(DEB_EXECUTABLE dpkg)
@@ -112,7 +114,7 @@ IF (UNIX)
     if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "found rpm build executeable --> able to build rpm")
         set(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib") # --> needed to not override existing folders
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
     else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "not found rpm build tools --> not building rpm")
     endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
@@ -132,12 +134,9 @@ IF (UNIX)
     SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
     SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
-    SET(CPACK_PACKAGE_VERSION_MAJOR "1")
-    SET(CPACK_PACKAGE_VERSION_MINOR "2")
-    set(CPACK_PACKAGE_VERSION_PATCH "1")
     SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
-    SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <ultimategameingcookie@gmail.com>")
+    SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
     set(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1)")
 
@@ -147,7 +146,7 @@ IF (UNIX)
             "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
             DEPENDS ${PROJECT_NAME}
             COMMENT "Installing ${PROJECT_NAME}")
-message("")
+    message("")
 ENDIF (UNIX)
 
 # check if Doxygen is installed
@@ -170,7 +169,6 @@ if (BUILD_DOC)
                 COMMENT "Generating API documentation with Doxygen"
                 VERBATIM)
         message(STATUS "Successfully configured doxygen")
-
     else (DOXYGEN_FOUND)
         message(STATUS "Doxygen need to be installed to generate the doxygen documentation")
     endif (DOXYGEN_FOUND)
