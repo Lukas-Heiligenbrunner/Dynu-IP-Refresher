@@ -10,15 +10,27 @@ A lightweight C++ application to setup a service for refreshing a dynamic IP to 
 ### install build dependencies
 
 `libcurl`
-`libcurl-devel`
 `libconfig`
-`libconfig-devel`
 
-Debian:
+#### Debian:
 `apt install libcurl4-openssl-dev`
 
-Fedora:
+#### Fedora:
 `dnf install libcurl-devel libconfig-devel`
+
+#### Alpine Linux:
+Compiler dependencies:
+
+`apk add make cmake g++`
+
+Lib dependencies:
+
+`apk add libcurl curl-dev libconfig libconfig-dev`
+
+Packaging dependencies:
+
+`apk add dpkg rpm`
+
 
 #### dependencies for package build
 `dpkg` --> debian/ubuntu package
@@ -38,7 +50,7 @@ cd into downloaded files and Generate makefiles:
 
 `make install`
 
-[root] or create Linux packages
+(optional) create Linux packages
 
 `make package`
 

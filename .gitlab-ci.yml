@@ -1,0 +1,17 @@
+image: luki42/dynuiprefresher_build:latest
+
+stages:
+  - build
+
+
+build:
+  stage: build
+  script:
+    - cmake -S . -B build
+    - cd build
+    - make
+    - make package
+  artifacts:
+    paths:
+      - "build/bin/*"
+      - "build/packages/*"
