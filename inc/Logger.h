@@ -15,8 +15,8 @@ public:
 
     static void log(const std::string &message, int level);
 
-    static const int Debug;
-    static const int Message;
-    static const int Warning;
-    static const int Error;
+    static const int Debug = 4;
+    static const int Message = 3;
+    static const int Warning = 2;
+    static const int Error = 1;
 };

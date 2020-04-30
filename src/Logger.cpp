@@ -7,12 +7,6 @@
 
 #include "Logger.h"
 
-
-const int Logger::Warning = 1;
-const int Logger::Debug = 2;
-const int Logger::Message = 3;
-const int Logger::Error = 4;
-
 void Logger::debug(const std::string message) {
     log(message, Logger::Debug);
 }

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
-set(PROJECT_VERSION 1.3.1-dev)
+set(PROJECT_VERSION 1.3.1)
 option(BUILD_DOC "Build documentation" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -69,7 +69,7 @@ add_library(logger ${LIB_METHOD}
 set(SOURCE
         src/main.cpp
         src/IPRefresher.cpp
-        src/Credentials.cpp)
+        src/Config.cpp)
 
 add_executable(iprefresher ${SOURCE})
 

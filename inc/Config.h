@@ -6,7 +6,7 @@
 
 #include <string>
 
-class Credentials {
+class Config {
 public:
     static std::string dynuapikey;
 

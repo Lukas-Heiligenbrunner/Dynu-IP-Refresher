@@ -14,7 +14,7 @@
 #include <Logger.h>
 
 #include <IPRefresher.h>
-#include <Credentials.h>
+#include <Config.h>
 
 void IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
@@ -34,11 +34,11 @@ void IPRefresher::checkIPAdress(bool force) {
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
             DynuAPI dynu;
-            dynu.init(Credentials::dynuapikey, Credentials::domainid, Credentials::domainname);
+            dynu.init(Config::dynuapikey, Config::domainid, Config::domainname);
 
             if (dynu.refreshIp(ip)) {
                 TelegramAPI tele;
-                tele.init(Credentials::telegramApiKey, Credentials::chatId);
+                tele.init(Config::telegramApiKey, Config::chatId);
                 tele.sendMessage(oldip + " moved to " + ip);
             } else {
                 //error
@@ -53,14 +53,16 @@ void IPRefresher::checkIPAdress(bool force) {
 IPRefresher::IPRefresher() = default;
 
 IPRefresher::IPRefresher(bool loop) {
-    if (Credentials::readCredentials()) {
+    if (loop) {
         Logger::message("startup of service");
-        while (loop) {
-            Logger::message("starting check");
-            checkIPAdress(false);
-            std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+        if (Config::readCredentials()) {
+            while (true) {
+                Logger::message("starting check");
+                checkIPAdress(false);
+                std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+            }
+        } else {
+            std::cout << "incorrect credentials!" << std::endl;
         }
-    } else {
-        std::cout << "incorrect credentials!" << std::endl;
     }
 }

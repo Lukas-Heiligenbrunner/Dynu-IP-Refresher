@@ -21,9 +21,9 @@ public:
      * @param domainId ID of domain received by Dynu
      * @param domainName domainname to refresh
      */
-    void init(std::string dynuApiKey, std::string domainId, std::string domainName);
+    void init(const std::string& dynuApiKey, const std::string& domainId, const std::string& domainName);
 private:
-    std::string dynuapikey;
+    std::string dynuapikey; // Dynu API key
 
     std::string domainid; //id of the dynu domain
     std::string domainname;

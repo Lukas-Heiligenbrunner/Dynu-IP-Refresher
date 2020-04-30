@@ -1,9 +1,16 @@
+//
+// Created by lukas on 18.06.19.
+//
+
 #include <iostream>
 #include <IPRefresher.h>
 #include <Version.h>
 #include <Logger.h>
-#include <Credentials.h>
+#include <Config.h>
 
+/**
+ * application entry point
+ */
 int main(int argc, char *argv[]) {
     if (argc > 1) {
         std::string firstarg(argv[1]);
@@ -17,7 +24,7 @@ int main(int argc, char *argv[]) {
             std::cout << "Version " << Version::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
             IPRefresher ipr;
-            if (Credentials::readCredentials()) {
+            if (Config::readCredentials()) {
                 ipr.checkIPAdress(true);
             } else {
                 std::cout << "incorrect credentials!" << std::endl;
@@ -31,12 +38,11 @@ int main(int argc, char *argv[]) {
     } else {
         IPRefresher ipr;
         Logger::message("starting check");
-        if (Credentials::readCredentials()) {
+        if (Config::readCredentials()) {
             ipr.checkIPAdress(false);
         } else {
             std::cout << "incorrect credentials!" << std::endl;
         }
-
     }
 
     return 0;

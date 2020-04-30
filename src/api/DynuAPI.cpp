@@ -5,19 +5,16 @@
 #include "api/DynuAPI.h"
 
 int DynuAPI::refreshIp(std:: string ip) {
-
     Hashmap<std::string, std::string> args;
     args.add("name", domainname);
     args.add("ipv4Address", ip);
 
     std::vector<std::string> headers;
-    headers.push_back("accept: application/json");
-    headers.push_back("User-Agent: Mozilla/5.0 (compatible; Rigor/1.0.0; http://rigor.com)");
-    headers.push_back("API-Key: " + dynuapikey);
+    headers.emplace_back("accept: application/json");
+    headers.emplace_back("User-Agent: Mozilla/5.0 (compatible; Rigor/1.0.0; http://rigor.com)");
+    headers.emplace_back("API-Key: " + dynuapikey);
 
-    std::string dynurepl = request("https://api.dynu.com/v2/dns/" + domainid, true, args, headers);
-
-//    std::cout << "[DEBUG] api reply:: " << dynurepl << std::endl;
+    const std::string dynurepl = request("https://api.dynu.com/v2/dns/" + domainid, true, args, headers);
 
     if (dynurepl != "{\"statusCode\":200}") {
         return -1;
@@ -26,7 +23,7 @@ int DynuAPI::refreshIp(std:: string ip) {
     }
 }
 
-void DynuAPI::init(std::string dynuApiKey, std::string domainId, std::string domainName) {
+void DynuAPI::init(const std::string& dynuApiKey, const std::string& domainId, const std::string& domainName) {
     this->dynuapikey=dynuApiKey;
     this->domainid=domainId;
     this->domainname=domainName;

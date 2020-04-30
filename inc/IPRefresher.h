@@ -11,6 +11,9 @@ public:
      */
     void checkIPAdress(bool force);
 
+    /**
+     * default constructor
+     */
     IPRefresher();
 
     /**

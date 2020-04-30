@@ -2,20 +2,20 @@
 // Created by lukas on 11.02.20.
 //
 
-#include <Credentials.h>
+#include <Config.h>
 #include <iostream>
 #include <cstring>
 
 #include "libconfig.h++"
 
-std::string Credentials::dynuapikey;
-std::string Credentials::domainid; //id of the dynu domain
-std::string Credentials::domainname;
+std::string Config::dynuapikey;
+std::string Config::domainid; //id of the dynu domain
+std::string Config::domainname;
 
-std::string Credentials::telegramApiKey;
-std::string Credentials::chatId;
+std::string Config::telegramApiKey;
+std::string Config::chatId;
 
-bool Credentials::readCredentials() {
+bool Config::readCredentials() {
     libconfig::Config cfg;
     try {
         cfg.readFile("/etc/iprefresher.cfg");
@@ -40,7 +40,6 @@ bool Credentials::readCredentials() {
         // optional parameters
         telegramApiKey = (std::string) cfg.lookup("telegramApiKey");
         chatId = (std::string) cfg.lookup("chatId");
-        std::cout << "Store name: " << dynuapikey << std::endl;
     }
     catch (const libconfig::SettingNotFoundException &nfex) {
         // triggered if setting is missing in config
@@ -49,5 +48,5 @@ bool Credentials::readCredentials() {
         }
     }
     // check if needed values aren't empty
-    return !(Credentials::dynuapikey.empty() || Credentials::domainid.empty() || Credentials::domainname.empty());
+    return !(Config::dynuapikey.empty() || Config::domainid.empty() || Config::domainname.empty());
 }

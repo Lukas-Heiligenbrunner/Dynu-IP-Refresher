@@ -1,5 +1,16 @@
 # DynuIPRefresher
 A lightweight C++ application to setup a service for refreshing a dynamic IP to the Dynu servers. 
+Dynu.com is a free DDns service and provides an API.
+
+## Installation
+Download the latest Release at [Release_Page](https://github.com/Lukas-Heiligenbrunner/DynuIPRefresher/releases).
+I'm providing executables for Debian/Ubuntu (.deb) and RHEL/Debian (.rpm). 
+But you can still compile the code my your own (see build section).
+
+## Configuration
+There is a configuration file `/etc/iprefresher.cfg` where you have to specify the DYNU API key (get it from their homepage), the domainid and your domain.
+Furthermore, you can optionally specify a Telegram API key and a Chat ID if you want to be notfied when your local ip changes.
+
 
 ## Build
 ## Basic Build
