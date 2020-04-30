@@ -134,7 +134,6 @@ IF (UNIX)
 ENDIF (UNIX)
 
 # check if Doxygen is installed
-
 if (BUILD_DOC)
     message(STATUS "config of DOxygen build")
     find_package(Doxygen)

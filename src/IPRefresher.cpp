@@ -23,7 +23,7 @@ void IPRefresher::checkIPAdress(bool force) {
     std::string ip = ipapi.getGlobalIp();
 
     if (ip.empty()) {
-        //no internet connection
+        //no internet connection (or other error)
         logger.logToLogfile("[WARNING] no internet connection");
         Logger::warning("no internet connection");
     } else {
@@ -37,7 +37,7 @@ void IPRefresher::checkIPAdress(bool force) {
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
             DynuAPI dynu;
-            dynu.init(Credentials::dynuapikey,Credentials::domainid,Credentials::domainname);
+            dynu.init(Credentials::dynuapikey, Credentials::domainid, Credentials::domainname);
 
             if (dynu.refreshIp(ip)) {
                 TelegramAPI tele;
@@ -55,14 +55,18 @@ void IPRefresher::checkIPAdress(bool force) {
 }
 
 IPRefresher::IPRefresher() {
-
+    // default constructor
 }
 
 IPRefresher::IPRefresher(bool loop) {
-    Logger::message("startup of service");
-    while (loop) {
-        Logger::message("starting check");
-        checkIPAdress(false);
-        std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+    if (Credentials::readCredentials()) {
+        Logger::message("startup of service");
+        while (loop) {
+            Logger::message("starting check");
+            checkIPAdress(false);
+            std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+        }
+    } else {
+        std::cout << "incorrect credentials!" << std::endl;
     }
 }

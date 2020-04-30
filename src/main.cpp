@@ -5,10 +5,6 @@
 #include <Credentials.h>
 
 int main(int argc, char *argv[]) {
-    if (!Credentials::readCredentials()) {
-        std::cout << "incorrect credentials!" << std::endl;
-        return -1;
-    }
     if (argc > 1) {
         std::string firstarg(argv[1]);
         if (firstarg == "-h" || firstarg == "--help") {
@@ -21,7 +17,12 @@ int main(int argc, char *argv[]) {
             std::cout << "Version " << Version::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
             IPRefresher ipr;
-            ipr.checkIPAdress(true);
+            if (Credentials::readCredentials()) {
+                ipr.checkIPAdress(true);
+            } else {
+                std::cout << "incorrect credentials!" << std::endl;
+            }
+
         } else if (firstarg == "-l" || firstarg == "--loop") {
             IPRefresher(true);
         } else {
@@ -30,7 +31,12 @@ int main(int argc, char *argv[]) {
     } else {
         IPRefresher ipr;
         Logger::message("starting check");
-        ipr.checkIPAdress(false);
+        if (Credentials::readCredentials()) {
+            ipr.checkIPAdress(false);
+        } else {
+            std::cout << "incorrect credentials!" << std::endl;
+        }
+
     }
 
     return 0;
