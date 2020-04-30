@@ -3,9 +3,7 @@
 //
 
 #include <fstream>
-#include <ctime>
 #include <iostream>
-#include <sstream>
 
 #include "FileLogger.h"
 
@@ -27,23 +25,4 @@ std::string FileLogger::readip() {
     in >> ip;
 
     return ip;
-}
-
-void FileLogger::logToLogfile(std::string text) {
-    std::ofstream out;
-    out.open("dynurefresher.log", std::ios::out | std::ios::app);
-
-
-    std::time_t t = std::time(0);   // get time now
-    std::tm *now = std::localtime(&t);
-
-    std::stringstream logline;
-
-    logline << "[ " << (now->tm_year + 1900) << '-' << (now->tm_mon + 1) << '-' << now->tm_mday
-            << "_" << now->tm_hour << ":" << now->tm_min << ":" << now->tm_sec << " ] " << '\t' << text << std::endl;
-
-
-    out << logline.str();
-
-    out.close();
 }

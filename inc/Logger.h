@@ -13,7 +13,7 @@ public:
     static void warning(std::string message);
     static void error(std::string message);
 
-    static void log(std::string &message, int level);
+    static void log(const std::string &message, int level);
 
     static const int Debug;
     static const int Message;

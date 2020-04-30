@@ -24,16 +24,13 @@ void IPRefresher::checkIPAdress(bool force) {
 
     if (ip.empty()) {
         //no internet connection (or other error)
-        logger.logToLogfile("[WARNING] no internet connection");
         Logger::warning("no internet connection");
     } else {
         std::string oldip = logger.readip();
 
         if (oldip == ip && !force) {
             Logger::message("no change -- ip: " + ip);
-            logger.logToLogfile(" [INFO] no change -- ip: " + ip);
         } else {
-            logger.logToLogfile(" [INFO] ip changed! -- from :" + oldip + "to: " + ip);
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
             DynuAPI dynu;
@@ -45,7 +42,6 @@ void IPRefresher::checkIPAdress(bool force) {
                 tele.sendMessage(oldip + " moved to " + ip);
             } else {
                 //error
-                logger.logToLogfile(" [ERROR] failed to write ip to dynu api!");
                 Logger::error("failed to write ip to dynu api!");
             }
 
@@ -54,9 +50,7 @@ void IPRefresher::checkIPAdress(bool force) {
     }
 }
 
-IPRefresher::IPRefresher() {
-    // default constructor
-}
+IPRefresher::IPRefresher() = default;
 
 IPRefresher::IPRefresher(bool loop) {
     if (Credentials::readCredentials()) {

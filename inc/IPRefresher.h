@@ -12,5 +12,11 @@ public:
     void checkIPAdress(bool force);
 
     IPRefresher();
+
+    /**
+     * start the service in loop mode
+     * every 5 minutes the ip is checked an refreshed (needed for .service)
+     * @param loop true->loopmode on
+     */
     explicit IPRefresher(bool loop);
 };

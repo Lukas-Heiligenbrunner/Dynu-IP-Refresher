@@ -48,5 +48,6 @@ bool Credentials::readCredentials() {
             std::cerr << "No '" << nfex.getPath() << "' setting in configuration file." << std::endl;
         }
     }
+    // check if needed values aren't empty
     return !(Credentials::dynuapikey.empty() || Credentials::domainid.empty() || Credentials::domainname.empty());
 }

@@ -13,23 +13,23 @@ const int Logger::Debug = 2;
 const int Logger::Message = 3;
 const int Logger::Error = 4;
 
-void Logger::debug(std::string message) {
+void Logger::debug(const std::string message) {
     log(message, Logger::Debug);
 }
 
-void Logger::message(std::string message) {
+void Logger::message(const std::string message) {
     log(message, Logger::Message);
 }
 
-void Logger::warning(std::string message) {
+void Logger::warning(const std::string message) {
     log(message, Logger::Warning);
 }
 
-void Logger::error(std::string message) {
+void Logger::error(const std::string message) {
     log(message, Logger::Error);
 }
 
-void Logger::log(std::string &message, int level) {
+void Logger::log(const std::string &message, int level) {
     std::stringstream out;
     out << "[";
     switch (level) {
