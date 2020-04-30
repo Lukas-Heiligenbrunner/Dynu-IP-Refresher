@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
-set(PROJECT_VERSION 1.3.0)
+set(PROJECT_VERSION 1.3.1-dev)
 option(BUILD_DOC "Build documentation" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -78,7 +78,7 @@ target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} config++)
 
 # INSTALL to SYSTEM #
 set(CMAKE_INSTALL_PREFIX "/")
-install(TARGETS iprefresher DESTINATION usr/local/bin)
+install(TARGETS iprefresher DESTINATION usr/bin)
 install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
 install(FILES config/iprefresher.cfg DESTINATION etc)
 
