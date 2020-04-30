@@ -5,52 +5,16 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
-set(WinBuild false)
 set(PROJECT_VERSION 1.2.3)
 option(BUILD_DOC "Build documentation" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-#set up toolchain
 
-if (${WinBuild})
-    set(LIBSUFFIX .dll)
-    set(SUFFIX .exe)
-
-    set(CMAKE_SYSTEM_NAME Windows)
-    set(TOOLCHAIN_PREFIX x86_64-w64-mingw32)
-    #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
-
-    # cross compilers to use for C and C++
-    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
-    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
-
-    # target environment on the build host system
-    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX} /usr/lib/gcc/${TOOLCHAIN_PREFIX}/9.2.1)
-
-
-    # modify default behavior of FIND_XXX() commands to
-    # search for headers/libs in the target environment and
-    # search for programs in the build host environment
-    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
-    #    set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -std=c++11 -static -DCURL_STATICLIB)
-    #    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -DCURL_STATICLIB -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DCURL_STATICLIB -static -lpthread")
-    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-    #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
-    #add_definitions(-DCURL_STATICLIB)
-else ()
-    set(LIBSUFFIX .so)
-    set(SUFFIX "")
-endif ()
-
-#config libs
+# config libs
 message(STATUS "Config of Libraries")
+# libcurl
 find_package(CURL REQUIRED)
 if (CURL_FOUND)
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
@@ -62,27 +26,23 @@ endif ()
 include_directories(${CURL_INCLUDE_DIR} inc)
 
 # libconfig
-FIND_PATH(CONFIG++_INCLUDE_DIR libconfig.h++ /usr/include /usr/local/include)
+FIND_PATH(LIBCONFIG_INCLUDE_DIR libconfig.h++ /usr/include /usr/local/include) # search for libconfig include headers
+FIND_LIBRARY(CONFIG++_LIBRARY NAMES config++ PATH /usr/lib /usr/local/lib) # search for actual lib
 
-FIND_LIBRARY(CONFIG++_LIBRARY NAMES config++ PATH /usr/lib /usr/local/lib)
-
-IF (CONFIG++_INCLUDE_DIR AND CONFIG++_LIBRARY)
-    SET(CONFIG++_FOUND TRUE)
-ENDIF ( CONFIG++_INCLUDE_DIR AND CONFIG++_LIBRARY)
-
-IF (CONFIG++_FOUND)
+IF (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
     MESSAGE(STATUS "Found Config++: ${CONFIG++_LIBRARY}")
-ELSE(CONFIG++_FOUND)
-    IF (Config++_FIND_REQUIRED)
-        IF(NOT CONFIG++_INCLUDE_DIR)
-            MESSAGE(FATAL_ERROR "Could not find LibConfig++ header file!")
-        ENDIF(NOT CONFIG++_INCLUDE_DIR)
+ELSE (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
+    IF (NOT LIBCONFIG_INCLUDE_DIR)
+        MESSAGE(FATAL_ERROR "Could not find LibConfig++ header file! Try to install 'libconfig-devel'")
+    ENDIF (NOT LIBCONFIG_INCLUDE_DIR)
 
-        IF(NOT CONFIG++_LIBRARY)
-            MESSAGE(FATAL_ERROR "Could not find LibConfig++ library file!")
-        ENDIF(NOT CONFIG++_LIBRARY)
-    ENDIF (Config++_FIND_REQUIRED)
-ENDIF (CONFIG++_FOUND)
+    IF (NOT CONFIG++_LIBRARY)
+        MESSAGE(FATAL_ERROR "Could not find LibConfig++ library file! Try to install 'libconfig'")
+    ENDIF (NOT CONFIG++_LIBRARY)
+ENDIF (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
+
+include_directories(${LIBCONFIG_INCLUDE_DIR})
+
 message("")
 
 #add version header
@@ -162,7 +122,7 @@ IF (UNIX)
     SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
-    set(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1)")
+    set(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1), libconfig (>= 1.5.0)")
 
     INCLUDE(CPack)
 

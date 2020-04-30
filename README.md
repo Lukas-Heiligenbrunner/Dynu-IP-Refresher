@@ -11,12 +11,14 @@ A lightweight C++ application to setup a service for refreshing a dynamic IP to 
 
 `libcurl`
 `libcurl-devel`
+`libconfig`
+`libconfig-devel`
 
 Debian:
 `apt install libcurl4-openssl-dev`
 
 Fedora:
-`dnf install libcurl-devel`
+`dnf install libcurl-devel libconfig-devel`
 
 #### dependencies for package build
 `dpkg` --> debian/ubuntu package
