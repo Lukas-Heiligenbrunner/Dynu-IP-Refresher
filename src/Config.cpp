@@ -3,11 +3,12 @@
 //
 
 #include <Config.h>
+#include <Logger.h>
+
 #include <iostream>
 #include <cstring>
 #include <fstream>
-
-#include "libconfig.h++"
+#include <libconfig.h++>
 
 std::string Config::dynuapikey;
 std::string Config::domainid; //id of the dynu domain
@@ -40,13 +41,12 @@ domainname = ""
 
         std::ofstream myfile;
         myfile.open("/etc/iprefresher.cfg");
-        if(myfile.is_open()){
+        if (myfile.is_open()) {
             myfile << defaultconf;
             myfile.close();
         } else {
             std::cout << "error creating file" << std::endl;
         }
-
 
         return false;
     }
@@ -56,7 +56,6 @@ domainname = ""
         return false;
     }
 
-    // Get the store name.
     try {
         // needed parameters
         dynuapikey = (std::string) cfg.lookup("dynuapikey");
@@ -74,4 +73,49 @@ domainname = ""
     }
     // check if needed values aren't empty
     return !(Config::dynuapikey.empty() || Config::domainid.empty() || Config::domainname.empty());
+}
+
+bool Config::validateConfig() {
+    libconfig::Config cfg;
+    try {
+        Logger::message("reading config file");
+        cfg.readFile("/etc/iprefresher.cfg");
+    }
+    catch (const libconfig::FileIOException &fioex) {
+        Logger::warning("config file doesn't exist or permission denied!");
+        return false;
+    }
+    catch (const libconfig::ParseException &pex) {
+        std::cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
+                  << " - " << pex.getError() << std::endl;
+        return false;
+    }
+    Logger::message("Syntax and Permission is OK");
+
+    try {
+        // needed parameters
+        if (((std::string) cfg.lookup("dynuapikey")).empty()) {
+            Logger::warning("required parameter dynuapikey seems to be empty.");
+            return false;
+        }
+        if (((std::string) cfg.lookup("domainid")).empty()) {
+            Logger::warning("required parameter domainid seems to be empty.");
+            return false;
+        }
+        if (((std::string) cfg.lookup("domainname")).empty()) {
+            Logger::warning("required parameter domainname seems to be empty.");
+            return false;
+        }
+        // optional parameters
+        cfg.lookup("telegramApiKey");
+        cfg.lookup("chatId");
+    }
+    catch (const libconfig::SettingNotFoundException &nfex) {
+        // triggered if setting is missing in config
+        if (!(std::strcmp("telegramApiKey", nfex.getPath()) == 0 || std::strcmp("chatId", nfex.getPath()) == 0)) {
+            std::cerr << "No '" << nfex.getPath() << "' setting in configuration file." << std::endl;
+            return false;
+        }
+    }
+    return true;
 }

@@ -1,6 +1,12 @@
-# author Lukas Heiligenbrunner
+# @author Lukas Heiligenbrunner
 # main CMake file
 #
+# Build lib dependencies:
+## libcurl (with sources)
+## libconfig (with sources)
+#
+# documenation build needs doxygen to be installed.
+
 cmake_minimum_required(VERSION 3.13)
 project(iprefresher DESCRIPTION "Dynu ip refresher")
 
@@ -8,7 +14,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE Release) # manually set build type (Release / Debug)
 set(LIB_METHOD STATIC) #SHARED / STATIC
-set(PROJECT_VERSION 1.3.1)
+set(PROJECT_VERSION 1.3.1-dev)
 option(BUILD_DOC "Build documentation" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

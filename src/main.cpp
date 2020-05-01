@@ -2,12 +2,12 @@
 // Created by lukas on 18.06.19.
 //
 
-#include <iostream>
 #include <Version.h>
 #include <IPRefresher.h>
 #include <Logger.h>
 #include <Config.h>
 
+#include <iostream>
 /**
  * application entry point
  */
@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
                       << "[-v] [--version] print the software version" << std::endl
                       << "[-f] [--force] force refresh of ip" << std::endl
                       << "[-l] [--loop] infinite loop to refresh ip every five minutes" << std::endl
+                      << "[-c] [--checkconfig] validate configuration" << std::endl
                       << "[no argument] normal ip check and refresh" << std::endl;
         } else if (firstarg == "-v" || firstarg == "--version") {
             std::cout << "Version " << Version::VERSION << std::endl;
@@ -32,6 +33,13 @@ int main(int argc, char *argv[]) {
 
         } else if (firstarg == "-l" || firstarg == "--loop") {
             IPRefresher(true);
+        } else if (firstarg == "-c" || firstarg == "--checkconfig") {
+            if (Config::validateConfig()) {
+                Logger::message("Config file is OK");
+            } else {
+                Logger::warning("There are errors in config file!");
+                return -1;
+            }
         } else {
             Logger::message("wrong arguments!  -h for help");
         }

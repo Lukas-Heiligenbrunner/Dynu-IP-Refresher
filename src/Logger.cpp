@@ -39,6 +39,9 @@ void Logger::log(const std::string &message, int level) {
         case Error:
             out << "ERROR";
             break;
+        default:
+            out << "UNDEFINED";
+            break;
     }
     out << "] ";
     out << message;

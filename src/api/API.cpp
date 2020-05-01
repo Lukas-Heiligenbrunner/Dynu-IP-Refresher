@@ -3,10 +3,7 @@
 //
 
 #include "api/API.h"
-#include "api/Hashmap.h"
 
-#include <string>
-#include <iostream>
 #include <sstream>
 #include <curl/curl.h>
 

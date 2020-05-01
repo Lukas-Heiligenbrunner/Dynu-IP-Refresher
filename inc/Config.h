@@ -16,7 +16,19 @@ public:
     static std::string telegramApiKey;
     static std::string chatId;
 
+    /**
+     * read configuration out of config file
+     *
+     * @return success of config read
+     */
     static bool readCredentials();
+
+    /**
+     * validate config file
+     *
+     * @return validity of config file
+     */
+    static bool validateConfig();
 
 private:
 };
