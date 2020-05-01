@@ -67,7 +67,7 @@ namespace Version {
         )
 
 # generate post script for checking if configuration already exists
-FILE(WRITE ${CMAKE_SOURCE_DIR}/postinstall.sh
+FILE(WRITE ${CMAKE_SOURCE_DIR}/conffiles
         "#!/bin/bash
 if [ ! -f /etc/iprefresher.cfg ]; then
     cat > /etc/iprefresher.cfg <<- EOM
@@ -119,7 +119,7 @@ IF (UNIX)
     if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "found rpm build executeable --> able to build rpm")
         SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-        SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinstall.sh")
+        SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/conffiles")
         SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
     else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "not found rpm build tools --> not building rpm")
@@ -129,7 +129,7 @@ IF (UNIX)
     if (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
         message(STATUS "found deb build tools --> able to build deb")
         SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinstall.sh")
+        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/conffiles")
     else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
         message(STATUS "not found  deb build tools --> not building deb")
     endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
@@ -146,7 +146,6 @@ IF (UNIX)
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
     SET(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1), libconfig (>= 1.5.0)")
-    SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinstall.sh")
 
     INCLUDE(CPack)
 
