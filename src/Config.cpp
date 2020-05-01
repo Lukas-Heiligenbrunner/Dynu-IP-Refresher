@@ -9,6 +9,7 @@
 #include <cstring>
 #include <fstream>
 #include <libconfig.h++>
+#include <Version.h>
 
 std::string Config::dynuapikey;
 std::string Config::domainid; //id of the dynu domain
@@ -25,24 +26,10 @@ bool Config::readCredentials() {
     catch (const libconfig::FileIOException &fioex) {
         std::cout << "I/O error while reading config file." << std::endl << "creating new config file!" << std::endl;
 
-        std::string defaultconf = R"(# Dynu IP refresher config
-# 2020
-# Lukas Heiligenbrunner
-
-## DYNU API Config
-dynuapikey = ""
-domainid = ""
-domainname = ""
-
-## Telegram API Config (optional)
-#telegramApiKey = ""
-#chatId = ""
-)";
-
         std::ofstream myfile;
         myfile.open("/etc/iprefresher.cfg");
         if (myfile.is_open()) {
-            myfile << defaultconf;
+            myfile << Version::SAMPLECONFIG;
             myfile.close();
         } else {
             std::cout << "error creating file" << std::endl;

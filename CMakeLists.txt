@@ -54,13 +54,18 @@ include_directories(${LIBCONFIG_INCLUDE_DIR})
 
 message("")
 
-#add version header
-FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
-        "\#pragma once\n#include <string>\nnamespace Version {\n  const std::string VERSION = \"${PROJECT_VERSION}\";\n}"
-        )
-
 #read sample config
 FILE(READ ${CMAKE_SOURCE_DIR}/config/iprefresher.cfg SAMPLECONFIG)
+#add version header
+FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
+        "\#pragma once
+#include <string>
+namespace Version {
+  const std::string VERSION = \"${PROJECT_VERSION}\";
+  const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
+}"
+        )
+
 # generate post script for checking if configuration already exists
 FILE(WRITE ${CMAKE_SOURCE_DIR}/postinstall.sh
         "#!/bin/bash
@@ -72,18 +77,13 @@ fi"
 
 add_library(api ${LIB_METHOD}
         src/api/API.cpp
-
         src/api/TelegramAPI.cpp
-
         src/api/DynuAPI.cpp
-
-        src/api/IPAPI.cpp
-        )
+        src/api/IPAPI.cpp)
 
 add_library(logger ${LIB_METHOD}
         src/FileLogger.cpp
-        src/Logger.cpp
-        )
+        src/Logger.cpp)
 
 
 SET(SOURCE
