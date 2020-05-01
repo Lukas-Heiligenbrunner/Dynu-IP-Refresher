@@ -15,6 +15,7 @@
 
 #include <IPRefresher.h>
 #include <Config.h>
+#include <Version.h>
 
 void IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
@@ -55,6 +56,7 @@ IPRefresher::IPRefresher() = default;
 IPRefresher::IPRefresher(bool loop) {
     if (loop) {
         Logger::message("startup of service");
+        Logger::message("Version: " + Version::VERSION);
         if (Config::readCredentials()) {
             while (true) {
                 Logger::message("starting check");

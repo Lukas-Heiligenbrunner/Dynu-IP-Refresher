@@ -5,6 +5,7 @@
 #include <Config.h>
 #include <iostream>
 #include <cstring>
+#include <fstream>
 
 #include "libconfig.h++"
 
@@ -22,7 +23,31 @@ bool Config::readCredentials() {
     }
     catch (const libconfig::FileIOException &fioex) {
         std::cout << "I/O error while reading config file." << std::endl << "creating new config file!" << std::endl;
-        cfg.writeFile("/etc/iprefresher.cfg");
+
+        std::string defaultconf = R"(# Dynu IP refresher config
+# 2020
+# Lukas Heiligenbrunner
+
+## DYNU API Config
+dynuapikey = ""
+domainid = ""
+domainname = ""
+
+## Telegram API Config (optional)
+#telegramApiKey = ""
+#chatId = ""
+)";
+
+        std::ofstream myfile;
+        myfile.open("/etc/iprefresher.cfg");
+        if(myfile.is_open()){
+            myfile << defaultconf;
+            myfile.close();
+        } else {
+            std::cout << "error creating file" << std::endl;
+        }
+
+
         return false;
     }
     catch (const libconfig::ParseException &pex) {

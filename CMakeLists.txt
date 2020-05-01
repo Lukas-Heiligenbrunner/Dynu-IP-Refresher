@@ -1,3 +1,6 @@
+# author Lukas Heiligenbrunner
+# main CMake file
+#
 cmake_minimum_required(VERSION 3.13)
 project(iprefresher DESCRIPTION "Dynu ip refresher")
 
@@ -47,7 +50,7 @@ message("")
 
 #add version header
 FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
-        "\#pragma once\nclass Version {\npublic:\n  static const std::string VERSION;\n};\n\nstd::string const Version::VERSION = \"${PROJECT_VERSION}\";"
+        "\#pragma once\n#include <string>\nnamespace Version {\n  const std::string VERSION = \"${PROJECT_VERSION}\";\n}"
         )
 
 add_library(api ${LIB_METHOD}
@@ -78,9 +81,17 @@ target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} config++)
 
 # INSTALL to SYSTEM #
 set(CMAKE_INSTALL_PREFIX "/")
+# install binaries
 install(TARGETS iprefresher DESTINATION usr/bin)
+# install config file if it doesn't exist
+install(CODE "MESSAGE(STATUS \"Copy iprefresher.cfg to ${CMAKE_INSTALL_PREFIX}etc/iprefresher.cfg\")
+    IF (NOT EXISTS ${CMAKE_INSTALL_PREFIX}etc/iprefresher.cfg)
+        EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}/config/iprefresher.cfg
+                ${CMAKE_INSTALL_PREFIX}etc/iprefresher.cfg)
+    ENDIF (NOT EXISTS ${CMAKE_INSTALL_PREFIX}etc/iprefresher.cfg)")
+# install systemd service and enable it
 install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
-install(FILES config/iprefresher.cfg DESTINATION etc)
 
 
 IF (UNIX)

@@ -3,8 +3,8 @@
 //
 
 #include <iostream>
-#include <IPRefresher.h>
 #include <Version.h>
+#include <IPRefresher.h>
 #include <Logger.h>
 #include <Config.h>
 
