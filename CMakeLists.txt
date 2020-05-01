@@ -67,12 +67,12 @@ namespace Version {
         )
 
 # generate post script for checking if configuration already exists
-FILE(WRITE ${CMAKE_SOURCE_DIR}/conffiles
+FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
         "#!/bin/bash
 if [ ! -f /etc/iprefresher.cfg ]; then
     cat > /etc/iprefresher.cfg <<- EOM
 ${SAMPLECONFIG}EOM
-fi"
+fi\n"
         )
 
 add_library(api ${LIB_METHOD}
@@ -119,7 +119,7 @@ IF (UNIX)
     if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "found rpm build executeable --> able to build rpm")
         SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-        SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/conffiles")
+        SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
         SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
     else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "not found rpm build tools --> not building rpm")
@@ -129,7 +129,7 @@ IF (UNIX)
     if (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
         message(STATUS "found deb build tools --> able to build deb")
         SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/conffiles")
+        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
     else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
         message(STATUS "not found  deb build tools --> not building deb")
     endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
