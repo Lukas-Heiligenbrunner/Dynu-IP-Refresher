@@ -11,6 +11,9 @@ But you can still compile the code my your own (see build section).
 There is a configuration file `/etc/iprefresher.cfg` where you have to specify the DYNU API key (get it from their homepage), the domainid and your domain.
 Furthermore, you can optionally specify a Telegram API key and a Chat ID if you want to be notfied when your local ip changes.
 
+To enable and start the service: 
+`systemctl enable iprefresher.service` and `systemctl start iprefresher.service`
+
 
 ## Build
 ## Basic Build
