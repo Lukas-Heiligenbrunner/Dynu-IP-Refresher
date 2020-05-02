@@ -121,6 +121,7 @@ IF (UNIX)
         SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
         SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
         SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
+        set(CPACK_RPM_PACKAGE_REQUIRES "libcurl,libconfig")
     else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
         message(STATUS "not found rpm build tools --> not building rpm")
     endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
@@ -128,8 +129,9 @@ IF (UNIX)
     #check if deb build is possible
     if (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
         message(STATUS "found deb build tools --> able to build deb")
-        SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
+        SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB") # add deb generator
+        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst") # set post inst file
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4,libconfig++9v5") # add debian dependencies
     else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
         message(STATUS "not found  deb build tools --> not building deb")
     endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
@@ -145,7 +147,6 @@ IF (UNIX)
     SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
     SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
-    SET(CPACK_PACKAGE_DEPENDS "libcurl (>= 7.0.0-1), libconfig (>= 1.5.0)")
 
     INCLUDE(CPack)
 
