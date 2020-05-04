@@ -16,41 +16,105 @@ SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
 SET(LIB_METHOD STATIC) #SHARED / STATIC
 SET(PROJECT_VERSION 1.3.2)
 option(BUILD_DOC "Build documentation" ON)
+set(WinBuild true)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+if (${WinBuild})
+    set(LIBSUFFIX .dll)
+    set(SUFFIX .exe)
+
+    set(CMAKE_SYSTEM_NAME WindowsStore)
+    set(CMAKE_SYSTEM_VERSION 10.0)
+    set(TOOLCHAIN_PREFIX x86_64-w64-mingw32) # x64 build toolchain
+    #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
+
+    # cross compilers to use for C and C++
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
+
+    # target environment on the build host system
+    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX})
+
+
+    # modify default behavior of FIND_XXX() commands to
+    # search for headers/libs in the target environment and
+    # search for programs in the build host environment
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+#        set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -std=c++11 -static -DCURL_STATICLIB)
+    #    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -DCURL_STATICLIB -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
+#    set(CMAKE_CXX_STANDARD_LIBRARIES " -lpthread ${CMAKE_CXX_STANDARD_LIBRARIES} -static")
+#
+#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
+    #add_definitions(-DCURL_STATICLIB)
+else ()
+    set(LIBSUFFIX .so)
+    set(SUFFIX "")
+endif ()
+
+
 # config libs
 message(STATUS "Config of Libraries")
 # libcurl
-find_package(CURL REQUIRED)
-if (CURL_FOUND)
+if (${WinBuild})
+    # configure libcurl
+    FIND_PATH(CURL_INCLUDE_DIRS curl/curl.h /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
+    FIND_LIBRARY(CURL_LIBRARIES NAMES curl HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
+
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
+    set(CURL_LIBRARIES /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libcurl.dll.a)
+
+    include_directories(${CURL_INCLUDE_DIRS} inc)
+
+    # configure libconfig
+    FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
+    FIND_LIBRARY(LIBCONFIG++_LIBRARIES NAMES config++ HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
+    set(LIBCONFIG++_LIBRARIES /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libconfig++.dll.a)
+
+    message(STATUS "Found LIBCONFIG++ version: ${CURL_VERSION_STRING}")
+    message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
+    message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
+
+    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
+
+    # configure libconfig
+
 else ()
-    message(FATAL_ERROR "Could not find CURL")
+    find_package(CURL REQUIRED)
+    if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
+        message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
+        message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
+        message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
+    else ()
+        message(FATAL_ERROR "Could not find CURL")
+    endif ()
+    include_directories(${CURL_INCLUDE_DIR} inc)
+
+    message("")
+    # libconfig
+    FIND_PACKAGE(libconfig++ REQUIRED)
+    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARY_DIRS)
+        message(STATUS "Found libconfig version: ${LIBCONFIG++_VERSION}")
+        message(STATUS "Using libconfig include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
+        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARY_DIRS}")
+    else ()
+        message(FATAL_ERROR "Could not find CURL")
+    endif ()
+    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
 endif ()
-include_directories(${CURL_INCLUDE_DIR} inc)
-
-# libconfig
-FIND_PATH(LIBCONFIG_INCLUDE_DIR libconfig.h++ /usr/include /usr/local/include) # search for libconfig include headers
-FIND_LIBRARY(CONFIG++_LIBRARY NAMES config++ PATH /usr/lib /usr/local/lib) # search for actual lib
-
-IF (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
-    MESSAGE(STATUS "Found Config++: ${CONFIG++_LIBRARY}")
-ELSE (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
-    IF (NOT LIBCONFIG_INCLUDE_DIR)
-        MESSAGE(FATAL_ERROR "Could not find LibConfig++ header file! Try to install 'libconfig-devel'")
-    ENDIF (NOT LIBCONFIG_INCLUDE_DIR)
-
-    IF (NOT CONFIG++_LIBRARY)
-        MESSAGE(FATAL_ERROR "Could not find LibConfig++ library file! Try to install 'libconfig'")
-    ENDIF (NOT CONFIG++_LIBRARY)
-ENDIF (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
-
-include_directories(${LIBCONFIG_INCLUDE_DIR})
 
 message("")
 
@@ -94,7 +158,7 @@ SET(SOURCE
 add_executable(iprefresher ${SOURCE})
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} config++)
+target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
 # INSTALL to SYSTEM #
 SET(CMAKE_INSTALL_PREFIX "/")

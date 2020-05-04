@@ -15,8 +15,8 @@ int TelegramAPI::sendMessage(const std::string& text) {
 
     std::string reply = request("https://api.telegram.org/bot" + apikey + "/sendmessage", false, args, headers);
 
-    unsigned const long ULONG_MAX = -1;
-    if (reply.find("\"error_code\"") != ULONG_MAX) {
+    unsigned long ulongmax = -1;
+    if (reply.find("\"error_code\"") != ulongmax) {
         Logger::error("failed to refresh the ip (Dynu API)");
         return -1;
     }
