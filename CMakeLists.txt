@@ -214,8 +214,6 @@ IF (NOT ${WinBuild})
     SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2")
 
     SET(CPACK_PACKAGE_SECTION "games")
-
-    INCLUDE(CPack)
 ELSE ()
     # Pack a NSIS intaller
     set(CPACK_GENERATOR NSIS)
