@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "API.h"
 
 #include <string>
-#include "API.h"
 
 class TelegramAPI : API {
 public:

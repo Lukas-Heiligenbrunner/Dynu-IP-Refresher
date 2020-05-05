@@ -2,20 +2,18 @@
 // Created by lukas on 02.08.19.
 //
 
+#include "IPRefresher.h"
+#include "FileLogger.h"
+#include "api/IPAPI.h"
+#include "api/DynuAPI.h"
+#include "api/TelegramAPI.h"
+#include "Config.h"
+#include "Version.h"
+
 #include <string>
-
-#include <FileLogger.h>
-#include <api/IPAPI.h>
-#include <api/DynuAPI.h>
-#include <api/TelegramAPI.h>
-
 #include <chrono>
 #include <thread>
 #include <Logger.h>
-
-#include <IPRefresher.h>
-#include <Config.h>
-#include <Version.h>
 #include <climits>
 
 void IPRefresher::checkIPAdress(bool force) {

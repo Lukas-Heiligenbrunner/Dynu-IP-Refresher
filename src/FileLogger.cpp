@@ -2,11 +2,11 @@
 // Created by lukas on 05.05.19.
 //
 
+#include "FileLogger.h"
+
 #include <fstream>
 #include <iostream>
 #include <climits>
-
-#include "FileLogger.h"
 
 void FileLogger::safeip(std::string ip) {
     std::ofstream out;

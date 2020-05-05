@@ -7,7 +7,6 @@
 #include <sstream>
 #include <curl/curl.h>
 
-
 std::string API::request(std::string myurl) {
     Hashmap<std::string, std::string> map;
     std::vector<std::string> str;
