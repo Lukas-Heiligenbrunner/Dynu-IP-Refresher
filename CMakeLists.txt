@@ -15,13 +15,14 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
 SET(LIB_METHOD STATIC) #SHARED / STATIC
 SET(PROJECT_VERSION 1.3.2)
-option(BUILD_DOC "Build documentation" ON)
+option(BUILD_DOC "Build documentation" OFF)
 set(WinBuild true)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# setup winbuild compilers
 if (${WinBuild})
     set(LIBSUFFIX .dll)
     set(SUFFIX .exe)
@@ -48,16 +49,13 @@ if (${WinBuild})
     set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
     set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-#        set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -std=c++11 -static -DCURL_STATICLIB)
-    #    set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++  -DCURL_STATICLIB -lstdc++ -lwsock32 -lws2_32 ${CMAKE_CSS_STANDARD_LIBRARIES}")
-#    set(CMAKE_CXX_STANDARD_LIBRARIES " -lpthread ${CMAKE_CXX_STANDARD_LIBRARIES} -static")
-#
-#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
-    #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-    #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
-    #add_definitions(-DCURL_STATICLIB)
+    set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CSS_STANDARD_LIBRARIES}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+    # currently libs are dynamically linked eg. dlls have to be copied to same folder
+    # todo link dynamically.
+    # maybe so: set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+    # or set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -static -DCURL_STATICLIB)
+    # or add_definitions(-DCURL_STATICLIB)
 else ()
     set(LIBSUFFIX .so)
     set(SUFFIX "")
@@ -68,21 +66,20 @@ endif ()
 message(STATUS "Config of Libraries")
 # libcurl
 if (${WinBuild})
+    SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
     # configure libcurl
     FIND_PATH(CURL_INCLUDE_DIRS curl/curl.h /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
-    FIND_LIBRARY(CURL_LIBRARIES NAMES curl HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
+    FIND_LIBRARY(CURL_LIBRARIES NAMES libcurl.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
 
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
-    set(CURL_LIBRARIES /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libcurl.dll.a)
 
     include_directories(${CURL_INCLUDE_DIRS} inc)
 
     # configure libconfig
     FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
-    FIND_LIBRARY(LIBCONFIG++_LIBRARIES NAMES config++ HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
-    set(LIBCONFIG++_LIBRARIES /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libconfig++.dll.a)
+    FIND_LIBRARY(LIBCONFIG++_LIBRARIES NAMES libconfig++.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
 
     message(STATUS "Found LIBCONFIG++ version: ${CURL_VERSION_STRING}")
     message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
@@ -160,16 +157,28 @@ add_executable(iprefresher ${SOURCE})
 # LINK generated LIBS #
 target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
-# INSTALL to SYSTEM #
+# General Packaging options:
+message(STATUS "config of Package build")
+
+set(CPACK_PACKAGE_NAME "DynuIpRefresher")
+SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
+SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
+SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
+SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
+
 SET(CMAKE_INSTALL_PREFIX "/")
-# install binaries
-install(TARGETS iprefresher DESTINATION usr/bin)
-# install systemd service and enable it
-install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+
+IF (NOT ${WinBuild})
+    # INSTALL to Linux SYSTEM #
+
+    # install binaries
+    install(TARGETS iprefresher DESTINATION usr/bin)
+    # install systemd service and enable it
+    install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
 
 
-IF (UNIX)
-    message(STATUS "config of Package build")
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
     SET(CPACK_OUTPUT_FILE_PREFIX packages)
     SET(CPACK_PACKAGING_INSTALL_PREFIX "/") # no prefix for package structure
@@ -204,22 +213,40 @@ IF (UNIX)
     SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
     SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2")
 
-    SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
-    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
-    SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
-    SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-    SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
-    SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
 
     INCLUDE(CPack)
+ELSE ()
+    # Pack a NSIS intaller
+    set(CPACK_GENERATOR NSIS)
 
-    add_custom_target(build-linux-packages
-            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Installing ${PROJECT_NAME}")
-    message("")
-ENDIF (UNIX)
+    set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
+    SET(CPACK_NSIS_MODIFY_PATH ON)
+
+    set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
+    install(TARGETS iprefresher DESTINATION .)
+    # todo more dynamic
+    install(FILES /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libcurl-4.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libssh2-1.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libstdc++-6.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc_s_seh-1.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libcrypto-1_1-x64.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libssl-1_1-x64.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/zlib1.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-0.dll
+            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libconfig++-11.dll
+            DESTINATION .)
+ENDIF ()
+
+INCLUDE(CPack)
+
+add_custom_target(build-packages
+        "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
+        DEPENDS ${PROJECT_NAME}
+        COMMENT "Installing ${PROJECT_NAME}")
+message("")
 
 # check if Doxygen is installed
 if (BUILD_DOC)
