@@ -56,9 +56,15 @@ if (${WinBuild})
     # maybe so: set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
     # or set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -static -DCURL_STATICLIB)
     # or add_definitions(-DCURL_STATICLIB)
+
+    # windows config path is same as executable
+    set(CONFIG_PATH "./iprefresher.cfg")
 else ()
     set(LIBSUFFIX .so)
     set(SUFFIX "")
+
+    # set /etc/ config path
+    set(CONFIG_PATH "/etc/iprefresher.cfg")
 endif ()
 
 
@@ -71,9 +77,9 @@ if (${WinBuild})
     FIND_PATH(CURL_INCLUDE_DIRS curl/curl.h /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
     FIND_LIBRARY(CURL_LIBRARIES NAMES libcurl.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
 
-    message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
+    message(STATUS "")
 
     include_directories(${CURL_INCLUDE_DIRS} inc)
 
@@ -81,14 +87,10 @@ if (${WinBuild})
     FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
     FIND_LIBRARY(LIBCONFIG++_LIBRARIES NAMES libconfig++.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
 
-    message(STATUS "Found LIBCONFIG++ version: ${CURL_VERSION_STRING}")
     message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
     message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
 
     include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
-
-    # configure libconfig
-
 else ()
     find_package(CURL REQUIRED)
     if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
@@ -123,17 +125,9 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
 #include <string>
 namespace Version {
   const std::string VERSION = \"${PROJECT_VERSION}\";
+  const std::string ConfigDir = \"${CONFIG_PATH}\";
   const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
 }"
-        )
-
-# generate post script for checking if configuration already exists
-FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
-        "#!/bin/bash
-if [ ! -f /etc/iprefresher.cfg ]; then
-    cat > /etc/iprefresher.cfg <<- EOM
-${SAMPLECONFIG}EOM
-fi\n"
         )
 
 add_library(api ${LIB_METHOD}
@@ -178,6 +172,15 @@ IF (NOT ${WinBuild})
     # install systemd service and enable it
     install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
 
+    # generate post script for checking if configuration already exists
+    FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
+            "#!/bin/bash
+if [ ! -f ${CONFIG_PATH} ]; then
+    cat > ${CONFIG_PATH} <<- EOM
+${SAMPLECONFIG}EOM
+fi\n"
+            )
+
 
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
     SET(CPACK_OUTPUT_FILE_PREFIX packages)
@@ -215,27 +218,34 @@ IF (NOT ${WinBuild})
 
     SET(CPACK_PACKAGE_SECTION "games")
 ELSE ()
+    # INSTALL to Windows SYSTEM #
+
+    # install binary to current folder
+    set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
+    install(TARGETS iprefresher DESTINATION .)
+
+    # install .dll dependencies
+    # todo check if files exist...
+    install(FILES /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcurl-4.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssh2-1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libstdc++-6.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libgcc_s_seh-1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcrypto-1_1-x64.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssl-1_1-x64.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libwinpthread-1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/zlib1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libidn2-0.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libconfig++-11.dll
+            DESTINATION .)
+
+
     # Pack a NSIS intaller
     set(CPACK_GENERATOR NSIS)
+    message(STATUS "Using NSIS Package build.")
 
     set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
     SET(CPACK_NSIS_MODIFY_PATH ON)
-
-    set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
-    install(TARGETS iprefresher DESTINATION .)
-    # todo more dynamic
-    install(FILES /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libcurl-4.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libssh2-1.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libstdc++-6.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc_s_seh-1.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libcrypto-1_1-x64.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libssl-1_1-x64.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/zlib1.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-0.dll
-            /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libconfig++-11.dll
-            DESTINATION .)
 ENDIF ()
 
 INCLUDE(CPack)
