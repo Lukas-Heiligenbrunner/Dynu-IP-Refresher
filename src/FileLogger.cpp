@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <climits>
 
 #include "FileLogger.h"
 
@@ -24,5 +25,9 @@ std::string FileLogger::readip() {
 
     in >> ip;
 
-    return ip;
+    // when received ip has no : return 0.0.0.0
+    if (ip.find(':') == ULONG_MAX)
+        return "0.0.0.0";
+    else
+        return ip;
 }

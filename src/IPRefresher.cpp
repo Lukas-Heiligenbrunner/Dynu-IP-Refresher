@@ -16,6 +16,7 @@
 #include <IPRefresher.h>
 #include <Config.h>
 #include <Version.h>
+#include <climits>
 
 void IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
@@ -26,6 +27,9 @@ void IPRefresher::checkIPAdress(bool force) {
     if (ip.empty()) {
         //no internet connection (or other error)
         Logger::warning("no internet connection");
+    } else if (ip.find(':') == ULONG_MAX) {
+        // error when ip doesn't contain a :
+        Logger::warning("an error occured when getting the global ip");
     } else {
         std::string oldip = logger.readip();
 
