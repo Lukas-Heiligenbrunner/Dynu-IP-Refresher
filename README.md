@@ -71,4 +71,16 @@ cd into downloaded files and Generate makefiles:
 
 
 ### Windows cross build
-TODO!
+Set Winbuild flag in CMakeList.txt.
+
+Dependencies:
+* MinGW Compiler
+* MinGW-libcurl
+* MinGW-libconfig++
+
+Optional dependencies
+* NSIS Pack tool (for creating installer)
+* doxygen (for generating html doc)
+
+Some addition configuration of lib paths may be needed in CMakeList.txt. 
+`make package` will pack it into a NSIS installer for Windows. 
