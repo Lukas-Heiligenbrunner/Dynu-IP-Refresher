@@ -9,14 +9,16 @@
 
 cmake_minimum_required(VERSION 3.13)
 project(iprefresher DESCRIPTION "Dynu ip refresher")
-
+SET(PROJECT_VERSION 1.3.3)
 SET(CMAKE_CXX_STANDARD 17)
 
+# CONFIGURATION
 SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
 SET(LIB_METHOD STATIC) #SHARED / STATIC
-SET(PROJECT_VERSION 1.3.2)
-option(BUILD_DOC "Build documentation" OFF)
-set(WinBuild true)
+
+option(BUILD_DOC "Build documentation" OFF) # additional dependency for Doxygen
+option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
+set(WinBuild false)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -151,19 +153,7 @@ add_executable(iprefresher ${SOURCE})
 # LINK generated LIBS #
 target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
-# General Packaging options:
-message(STATUS "config of Package build")
-
-set(CPACK_PACKAGE_NAME "DynuIpRefresher")
-SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
-SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
-SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
-SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
-
-SET(CMAKE_INSTALL_PREFIX "/")
-
+# setting install targets
 IF (NOT ${WinBuild})
     # INSTALL to Linux SYSTEM #
 
@@ -171,52 +161,6 @@ IF (NOT ${WinBuild})
     install(TARGETS iprefresher DESTINATION usr/bin)
     # install systemd service and enable it
     install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
-
-    # generate post script for checking if configuration already exists
-    FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
-            "#!/bin/bash
-if [ ! -f ${CONFIG_PATH} ]; then
-    cat > ${CONFIG_PATH} <<- EOM
-${SAMPLECONFIG}EOM
-fi\n"
-            )
-
-
-    SET(CPACK_DEB_COMPONENT_INSTALL 1)
-    SET(CPACK_OUTPUT_FILE_PREFIX packages)
-    SET(CPACK_PACKAGING_INSTALL_PREFIX "/") # no prefix for package structure
-
-    FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
-    FIND_PROGRAM(DEB_EXECUTABLE dpkg)
-
-    SET(CPACK_GENERATOR "TGZ;TBZ2")
-
-    #check if rpm build is possible
-    if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
-        message(STATUS "found rpm build executeable --> able to build rpm")
-        SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-        SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
-        SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
-        set(CPACK_RPM_PACKAGE_REQUIRES "libcurl,libconfig")
-    else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
-        message(STATUS "not found rpm build tools --> not building rpm")
-    endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
-
-    #check if deb build is possible
-    if (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
-        message(STATUS "found deb build tools --> able to build deb")
-        SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB") # add deb generator
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst") # set post inst file
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4,libconfig++9v5") # add debian dependencies
-    else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
-        message(STATUS "not found  deb build tools --> not building deb")
-    endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
-
-
-    SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
-    SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2")
-
-    SET(CPACK_PACKAGE_SECTION "games")
 ELSE ()
     # INSTALL to Windows SYSTEM #
 
@@ -237,24 +181,86 @@ ELSE ()
             /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libidn2-0.dll
             /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libconfig++-11.dll
             DESTINATION .)
-
-
-    # Pack a NSIS intaller
-    set(CPACK_GENERATOR NSIS)
-    message(STATUS "Using NSIS Package build.")
-
-    set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
-    SET(CPACK_NSIS_MODIFY_PATH ON)
 ENDIF ()
 
-INCLUDE(CPack)
+if (${PACKAGING})
+    # General Packaging options:
+    message(STATUS "config of Package build")
 
-add_custom_target(build-packages
-        "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
-        DEPENDS ${PROJECT_NAME}
-        COMMENT "Installing ${PROJECT_NAME}")
-message("")
+    set(CPACK_PACKAGE_NAME "DynuIpRefresher")
+    SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
+    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
+    SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
+    SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
+    SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
+
+    SET(CMAKE_INSTALL_PREFIX "/")
+
+    IF (NOT ${WinBuild})
+        # generate post script for checking if configuration already exists
+        FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
+                "#!/bin/bash
+if [ ! -f ${CONFIG_PATH} ]; then
+    cat > ${CONFIG_PATH} <<- EOM
+${SAMPLECONFIG}EOM
+fi\n"
+                )
+
+
+        SET(CPACK_DEB_COMPONENT_INSTALL 1)
+        SET(CPACK_OUTPUT_FILE_PREFIX packages)
+        SET(CPACK_PACKAGING_INSTALL_PREFIX "/") # no prefix for package structure
+
+        FIND_PROGRAM(RPMBUILD_EXECUTABLE rpmbuild)
+        FIND_PROGRAM(DEB_EXECUTABLE dpkg)
+
+        SET(CPACK_GENERATOR "TGZ;TBZ2")
+
+        #check if rpm build is possible
+        if (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
+            message(STATUS "found rpm build executeable --> able to build rpm")
+            SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
+            SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
+            SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
+            set(CPACK_RPM_PACKAGE_REQUIRES "libcurl,libconfig")
+        else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
+            message(STATUS "not found rpm build tools --> not building rpm")
+        endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
+
+        #check if deb build is possible
+        if (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
+            message(STATUS "found deb build tools --> able to build deb")
+            SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB") # add deb generator
+            set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst") # set post inst file
+            set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4,libconfig++9v5") # add debian dependencies
+        else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
+            message(STATUS "not found  deb build tools --> not building deb")
+        endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
+
+
+        SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
+        SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2")
+
+        SET(CPACK_PACKAGE_SECTION "games")
+    ELSE ()
+        # Pack a NSIS intaller
+        set(CPACK_GENERATOR NSIS)
+        message(STATUS "Using NSIS Package build.")
+
+        set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
+        set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
+        SET(CPACK_NSIS_MODIFY_PATH ON)
+    ENDIF ()
+
+    INCLUDE(CPack)
+
+    add_custom_target(build-packages
+            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
+            DEPENDS ${PROJECT_NAME}
+            COMMENT "Packing ${PROJECT_NAME}")
+    message("")
+ENDIF ()
 
 # check if Doxygen is installed
 if (BUILD_DOC)
