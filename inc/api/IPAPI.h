@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <string>
 #include "API.h"
+
+#include <string>
 
 class IPAPI : API{
 public:

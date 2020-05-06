@@ -2,10 +2,10 @@
 // Created by lukas on 26.10.19.
 //
 
+#include "Logger.h"
+
 #include <sstream>
 #include <iostream>
-
-#include "Logger.h"
 
 void Logger::debug(const std::string message) {
     log(message, Logger::Debug);

@@ -2,12 +2,14 @@
 // Created by lukas on 18.06.19.
 //
 
-#include <Version.h>
-#include <IPRefresher.h>
-#include <Logger.h>
-#include <Config.h>
+#include "Version.h"
+#include "IPRefresher.h"
+#include "Logger.h"
+#include "Config.h"
+#include "api/IPAPI.h"
 
 #include <iostream>
+
 /**
  * application entry point
  */
@@ -20,6 +22,7 @@ int main(int argc, char *argv[]) {
                       << "[-f] [--force] force refresh of ip" << std::endl
                       << "[-l] [--loop] infinite loop to refresh ip every five minutes" << std::endl
                       << "[-c] [--checkconfig] validate configuration" << std::endl
+                      << "[-ip] [--currentip] get current global ip" << std::endl
                       << "[no argument] normal ip check and refresh" << std::endl;
         } else if (firstarg == "-v" || firstarg == "--version") {
             std::cout << "Version " << Version::VERSION << std::endl;
@@ -40,6 +43,9 @@ int main(int argc, char *argv[]) {
                 Logger::warning("There are errors in config file!");
                 return -1;
             }
+        } else if (firstarg == "-ip" || firstarg == "--currentip") {
+            IPAPI ipapi;
+            std::cout << "Current global IP: " << ipapi.getGlobalIp() << std::endl;
         } else {
             Logger::message("wrong arguments!  -h for help");
         }

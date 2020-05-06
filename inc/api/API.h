@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "Hashmap.h"
 
 #include <string>
-#include "Hashmap.h"
 
 class API {
 public:
