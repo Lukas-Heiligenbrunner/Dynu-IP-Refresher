@@ -144,11 +144,10 @@ add_library(logger ${LIB_METHOD}
 
 
 SET(SOURCE
-        src/main.cpp
         src/IPRefresher.cpp
         src/Config.cpp)
 
-add_executable(iprefresher ${SOURCE})
+add_executable(iprefresher src/main.cpp ${SOURCE})
 
 # LINK generated LIBS #
 target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
@@ -286,3 +285,31 @@ if (BUILD_DOC)
     endif (DOXYGEN_FOUND)
     message("")
 endif (BUILD_DOC)
+
+include(GoogleTest)
+
+mark_as_advanced(
+        BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+        gmock_build_tests gtest_build_samples gtest_build_tests
+        gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+)
+
+enable_testing()
+
+macro(package_add_test TESTNAME)
+    # create an exectuable in which the tests will be stored
+    add_executable(${TESTNAME} ${ARGN})
+    # link the Google test infrastructure, mocking library, and a default main fuction to
+    # the test executable.  Remove g_test_main if writing your own main function.
+    target_link_libraries(${TESTNAME} gtest gtest_main api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+    # gtest_discover_tests replaces gtest_add_tests,
+    # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
+    gtest_discover_tests(${TESTNAME}
+            # set a working directory so your project root so that you can find test data via paths relative to the project root
+            WORKING_DIRECTORY ${PROJECT_DIR}
+            PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+            )
+    set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+endmacro()
+
+package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
