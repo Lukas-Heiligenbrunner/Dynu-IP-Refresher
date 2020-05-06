@@ -15,42 +15,105 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
 SET(LIB_METHOD STATIC) #SHARED / STATIC
 SET(PROJECT_VERSION 1.3.2)
-option(BUILD_DOC "Build documentation" ON)
+option(BUILD_DOC "Build documentation" OFF)
+set(WinBuild true)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# setup winbuild compilers
+if (${WinBuild})
+    set(LIBSUFFIX .dll)
+    set(SUFFIX .exe)
+
+    set(CMAKE_SYSTEM_NAME WindowsStore)
+    set(CMAKE_SYSTEM_VERSION 10.0)
+    set(TOOLCHAIN_PREFIX x86_64-w64-mingw32) # x64 build toolchain
+    #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
+
+    # cross compilers to use for C and C++
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
+
+    # target environment on the build host system
+    set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX})
+
+
+    # modify default behavior of FIND_XXX() commands to
+    # search for headers/libs in the target environment and
+    # search for programs in the build host environment
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+    set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CSS_STANDARD_LIBRARIES}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+    # currently libs are dynamically linked eg. dlls have to be copied to same folder
+    # todo link dynamically.
+    # maybe so: set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+    # or set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -static -DCURL_STATICLIB)
+    # or add_definitions(-DCURL_STATICLIB)
+
+    # windows config path is same as executable
+    set(CONFIG_PATH "./iprefresher.cfg")
+else ()
+    set(LIBSUFFIX .so)
+    set(SUFFIX "")
+
+    # set /etc/ config path
+    set(CONFIG_PATH "/etc/iprefresher.cfg")
+endif ()
+
+
 # config libs
 message(STATUS "Config of Libraries")
 # libcurl
-find_package(CURL REQUIRED)
-if (CURL_FOUND)
-    message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
+if (${WinBuild})
+    SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
+    # configure libcurl
+    FIND_PATH(CURL_INCLUDE_DIRS curl/curl.h /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
+    FIND_LIBRARY(CURL_LIBRARIES NAMES libcurl.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
+
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
+    message(STATUS "")
+
+    include_directories(${CURL_INCLUDE_DIRS} inc)
+
+    # configure libconfig
+    FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
+    FIND_LIBRARY(LIBCONFIG++_LIBRARIES NAMES libconfig++.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
+
+    message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
+    message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
+
+    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
 else ()
-    message(FATAL_ERROR "Could not find CURL")
+    find_package(CURL REQUIRED)
+    if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
+        message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
+        message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
+        message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
+    else ()
+        message(FATAL_ERROR "Could not find CURL")
+    endif ()
+    include_directories(${CURL_INCLUDE_DIR} inc)
+
+    message("")
+    # libconfig
+    FIND_PACKAGE(libconfig++ REQUIRED)
+    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARY_DIRS)
+        message(STATUS "Found libconfig version: ${LIBCONFIG++_VERSION}")
+        message(STATUS "Using libconfig include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
+        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARY_DIRS}")
+    else ()
+        message(FATAL_ERROR "Could not find CURL")
+    endif ()
+    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
 endif ()
-include_directories(${CURL_INCLUDE_DIR} inc)
-
-# libconfig
-FIND_PATH(LIBCONFIG_INCLUDE_DIR libconfig.h++ /usr/include /usr/local/include) # search for libconfig include headers
-FIND_LIBRARY(CONFIG++_LIBRARY NAMES config++ PATH /usr/lib /usr/local/lib) # search for actual lib
-
-IF (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
-    MESSAGE(STATUS "Found Config++: ${CONFIG++_LIBRARY}")
-ELSE (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
-    IF (NOT LIBCONFIG_INCLUDE_DIR)
-        MESSAGE(FATAL_ERROR "Could not find LibConfig++ header file! Try to install 'libconfig-devel'")
-    ENDIF (NOT LIBCONFIG_INCLUDE_DIR)
-
-    IF (NOT CONFIG++_LIBRARY)
-        MESSAGE(FATAL_ERROR "Could not find LibConfig++ library file! Try to install 'libconfig'")
-    ENDIF (NOT CONFIG++_LIBRARY)
-ENDIF (CONFIG++_LIBRARY AND LIBCONFIG_INCLUDE_DIR)
-
-include_directories(${LIBCONFIG_INCLUDE_DIR})
 
 message("")
 
@@ -62,17 +125,9 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
 #include <string>
 namespace Version {
   const std::string VERSION = \"${PROJECT_VERSION}\";
+  const std::string ConfigDir = \"${CONFIG_PATH}\";
   const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
 }"
-        )
-
-# generate post script for checking if configuration already exists
-FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
-        "#!/bin/bash
-if [ ! -f /etc/iprefresher.cfg ]; then
-    cat > /etc/iprefresher.cfg <<- EOM
-${SAMPLECONFIG}EOM
-fi\n"
         )
 
 add_library(api ${LIB_METHOD}
@@ -94,18 +149,39 @@ SET(SOURCE
 add_executable(iprefresher ${SOURCE})
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} config++)
+target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
-# INSTALL to SYSTEM #
+# General Packaging options:
+message(STATUS "config of Package build")
+
+set(CPACK_PACKAGE_NAME "DynuIpRefresher")
+SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
+SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
+SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
+SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
+
 SET(CMAKE_INSTALL_PREFIX "/")
-# install binaries
-install(TARGETS iprefresher DESTINATION usr/bin)
-# install systemd service and enable it
-install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+
+IF (NOT ${WinBuild})
+    # INSTALL to Linux SYSTEM #
+
+    # install binaries
+    install(TARGETS iprefresher DESTINATION usr/bin)
+    # install systemd service and enable it
+    install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+
+    # generate post script for checking if configuration already exists
+    FILE(WRITE ${CMAKE_SOURCE_DIR}/postinst
+            "#!/bin/bash
+if [ ! -f ${CONFIG_PATH} ]; then
+    cat > ${CONFIG_PATH} <<- EOM
+${SAMPLECONFIG}EOM
+fi\n"
+            )
 
 
-IF (UNIX)
-    message(STATUS "config of Package build")
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
     SET(CPACK_OUTPUT_FILE_PREFIX packages)
     SET(CPACK_PACKAGING_INSTALL_PREFIX "/") # no prefix for package structure
@@ -140,22 +216,45 @@ IF (UNIX)
     SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
     SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2")
 
-    SET(CPACK_PACKAGE_DESCRIPTION "IPrefresher to refresh Dynu ip address and notify user via Telegram")
-    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "IPrefresher to refresh Dynu ip address and notify user via Telegram")
-    SET(CPACK_PACKAGE_VENDOR "Lukas Heilgienbrunner")
-    SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-    SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
-    SET(CPACK_PACKAGE_CONTACT "Lukas Heiligenbrunner <lukas.heiligenbrunner@gmail.com>")
     SET(CPACK_PACKAGE_SECTION "games")
+ELSE ()
+    # INSTALL to Windows SYSTEM #
 
-    INCLUDE(CPack)
+    # install binary to current folder
+    set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
+    install(TARGETS iprefresher DESTINATION .)
 
-    add_custom_target(build-linux-packages
-            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Installing ${PROJECT_NAME}")
-    message("")
-ENDIF (UNIX)
+    # install .dll dependencies
+    # todo check if files exist...
+    install(FILES /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcurl-4.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssh2-1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libstdc++-6.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libgcc_s_seh-1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcrypto-1_1-x64.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssl-1_1-x64.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libwinpthread-1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/zlib1.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libidn2-0.dll
+            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libconfig++-11.dll
+            DESTINATION .)
+
+
+    # Pack a NSIS intaller
+    set(CPACK_GENERATOR NSIS)
+    message(STATUS "Using NSIS Package build.")
+
+    set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
+    SET(CPACK_NSIS_MODIFY_PATH ON)
+ENDIF ()
+
+INCLUDE(CPack)
+
+add_custom_target(build-packages
+        "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
+        DEPENDS ${PROJECT_NAME}
+        COMMENT "Installing ${PROJECT_NAME}")
+message("")
 
 # check if Doxygen is installed
 if (BUILD_DOC)

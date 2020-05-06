@@ -21,13 +21,14 @@ std::string Config::chatId;
 bool Config::readCredentials() {
     libconfig::Config cfg;
     try {
-        cfg.readFile("/etc/iprefresher.cfg");
+        // todo make dynamic here
+        cfg.readFile(Version::ConfigDir.c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
         std::cout << "I/O error while reading config file." << std::endl << "creating new config file!" << std::endl;
 
         std::ofstream myfile;
-        myfile.open("/etc/iprefresher.cfg");
+        myfile.open(Version::ConfigDir);
         if (myfile.is_open()) {
             myfile << Version::SAMPLECONFIG;
             myfile.close();
@@ -66,7 +67,7 @@ bool Config::validateConfig() {
     libconfig::Config cfg;
     try {
         Logger::message("reading config file");
-        cfg.readFile("/etc/iprefresher.cfg");
+        cfg.readFile(Version::ConfigDir.c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
         Logger::warning("config file doesn't exist or permission denied!");
