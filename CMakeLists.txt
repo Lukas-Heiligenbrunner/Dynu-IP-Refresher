@@ -303,7 +303,7 @@ if (TESTS)
         add_executable(${TESTNAME} ${ARGN})
         # link the Google test infrastructure, mocking library, and a default main fuction to
         # the test executable.  Remove g_test_main if writing your own main function.
-        target_link_libraries(${TESTNAME} gtest gtest_main api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+        target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
         # gtest_discover_tests replaces gtest_add_tests,
         # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
         gtest_discover_tests(${TESTNAME}
