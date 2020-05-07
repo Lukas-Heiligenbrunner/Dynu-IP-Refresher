@@ -9,12 +9,11 @@
 #include "api/TelegramAPI.h"
 #include "Config.h"
 #include "Version.h"
+#include "IpHelper.h"
 
-#include <string>
 #include <chrono>
 #include <thread>
 #include <Logger.h>
-#include <climits>
 
 void IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
@@ -25,7 +24,7 @@ void IPRefresher::checkIPAdress(bool force) {
     if (ip.empty()) {
         //no internet connection (or other error)
         Logger::warning("no internet connection");
-    } else if (ip.find(':') == ULONG_MAX) {
+    } else if (!IpHelper::isIpValid(ip)) {
         // error when ip doesn't contain a :
         Logger::warning("an error occured when getting the global ip");
     } else {
@@ -37,13 +36,15 @@ void IPRefresher::checkIPAdress(bool force) {
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
             DynuAPI dynu;
-            dynu.init(Config::dynuapikey, Config::domainid, Config::domainname);
+            dynu.init(Config::getDynuapikey(), Config::getDomainid(), Config::getDomainname());
+            // actual refresh of IP in api - here
+            bool result = dynu.refreshIp(ip);
 
-            if (dynu.refreshIp(ip)) {
+            if (result && Config::isTelegramSupported()) {
                 TelegramAPI tele;
-                tele.init(Config::telegramApiKey, Config::chatId);
+                tele.init(Config::getTelegramApiKey(), Config::getChatId());
                 tele.sendMessage(oldip + " moved to " + ip);
-            } else {
+            } else if (!result) {
                 //error
                 Logger::error("failed to write ip to dynu api!");
             }
@@ -53,13 +54,11 @@ void IPRefresher::checkIPAdress(bool force) {
     }
 }
 
-IPRefresher::IPRefresher() = default;
-
 IPRefresher::IPRefresher(bool loop) {
     if (loop) {
         Logger::message("startup of service");
         Logger::message("Version: " + Version::VERSION);
-        if (Config::readCredentials()) {
+        if (Config::readConfig()) {
             while (true) {
                 Logger::message("starting check");
                 checkIPAdress(false);

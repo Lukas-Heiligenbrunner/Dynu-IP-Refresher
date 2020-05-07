@@ -107,15 +107,22 @@ else ()
 
     message("")
     # libconfig
-    FIND_PACKAGE(libconfig++ REQUIRED)
-    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARY_DIRS)
-        message(STATUS "Found libconfig version: ${LIBCONFIG++_VERSION}")
+    FIND_PATH(LIBCONFIG++_INCLUDE_DIRS
+            NAMES libconfig.h++
+            PATHS /usr/include /usr/local/include) # search for libconfig include headers
+    FIND_LIBRARY(LIBCONFIG++_LIBRARIES
+            NAMES config++
+            PATHS /usr/lib /usr/local/lib) # search for actual lib
+
+    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARIES)
+        message(STATUS "Fount libconfig!")
         message(STATUS "Using libconfig include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
-        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARY_DIRS}")
+        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARIES}")
     else ()
-        message(FATAL_ERROR "Could not find CURL")
+        message(FATAL_ERROR "Could not find LIBCONFIG")
     endif ()
-    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
+
+    include_directories(${LIBCONFIG_INCLUDE_DIRS})
 endif ()
 
 message("")
@@ -146,7 +153,8 @@ add_library(logger ${LIB_METHOD}
 
 SET(SOURCE
         src/IPRefresher.cpp
-        src/Config.cpp)
+        src/Config.cpp
+        src/IpHelper.cpp)
 
 add_executable(iprefresher src/main.cpp ${SOURCE})
 

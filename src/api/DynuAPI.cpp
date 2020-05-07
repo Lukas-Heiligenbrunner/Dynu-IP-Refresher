@@ -4,7 +4,7 @@
 
 #include "api/DynuAPI.h"
 
-int DynuAPI::refreshIp(std:: string ip) {
+bool DynuAPI::refreshIp(std::string ip) {
     Hashmap<std::string, std::string> args;
     args.add("name", domainname);
     args.add("ipv4Address", ip);
@@ -16,15 +16,11 @@ int DynuAPI::refreshIp(std:: string ip) {
 
     const std::string dynurepl = request("https://api.dynu.com/v2/dns/" + domainid, true, args, headers);
 
-    if (dynurepl != "{\"statusCode\":200}") {
-        return -1;
-    } else {
-        return 1;
-    }
+    return (dynurepl == "{\"statusCode\":200}");
 }
 
-void DynuAPI::init(const std::string& dynuApiKey, const std::string& domainId, const std::string& domainName) {
-    this->dynuapikey=dynuApiKey;
-    this->domainid=domainId;
-    this->domainname=domainName;
+void DynuAPI::init(const std::string &dynuApiKey, const std::string &domainId, const std::string &domainName) {
+    this->dynuapikey = dynuApiKey;
+    this->domainid = domainId;
+    this->domainname = domainName;
 }

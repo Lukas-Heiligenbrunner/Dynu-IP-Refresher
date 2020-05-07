@@ -14,7 +14,7 @@ public:
      * send telegram Message to predefined destination
      * @param text message
      */
-    int sendMessage(const std::string& text);
+    int sendMessage(const std::string &text);
 
     /**
      * init Telegram api with apikey and chatid

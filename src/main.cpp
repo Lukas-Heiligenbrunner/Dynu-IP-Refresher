@@ -8,8 +8,6 @@
 #include "Config.h"
 #include "api/IPAPI.h"
 
-#include <iostream>
-
 /**
  * application entry point
  */
@@ -28,7 +26,7 @@ int main(int argc, char *argv[]) {
             std::cout << "Version " << Version::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
             IPRefresher ipr;
-            if (Config::readCredentials()) {
+            if (Config::readConfig()) {
                 ipr.checkIPAdress(true);
             } else {
                 std::cout << "incorrect credentials!" << std::endl;
@@ -40,7 +38,7 @@ int main(int argc, char *argv[]) {
             if (Config::validateConfig()) {
                 Logger::message("Config file is OK");
             } else {
-                Logger::warning("There are errors in config file!");
+                Logger::error("There are errors in config file!");
                 return -1;
             }
         } else if (firstarg == "-ip" || firstarg == "--currentip") {
@@ -52,7 +50,7 @@ int main(int argc, char *argv[]) {
     } else {
         IPRefresher ipr;
         Logger::message("starting check");
-        if (Config::readCredentials()) {
+        if (Config::readConfig()) {
             ipr.checkIPAdress(false);
         } else {
             std::cout << "incorrect credentials!" << std::endl;

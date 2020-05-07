@@ -6,14 +6,14 @@
 
 #include "API.h"
 
-class DynuAPI : API{
+class DynuAPI : API {
 public:
     /**
      * refresh the ip of domain on Dynu server
      * @param ip new ip
      * @return request status
      */
-    int refreshIp(std::string ip);
+    bool refreshIp(std::string ip);
 
     /**
      * init Telegram api with apikey and chatid
@@ -21,7 +21,8 @@ public:
      * @param domainId ID of domain received by Dynu
      * @param domainName domainname to refresh
      */
-    void init(const std::string& dynuApiKey, const std::string& domainId, const std::string& domainName);
+    void init(const std::string &dynuApiKey, const std::string &domainId, const std::string &domainName);
+
 private:
     std::string dynuapikey; // Dynu API key
 

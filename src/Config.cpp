@@ -18,10 +18,11 @@ std::string Config::domainname;
 std::string Config::telegramApiKey;
 std::string Config::chatId;
 
-bool Config::readCredentials() {
+bool Config::telegramSupport;
+
+bool Config::readConfig() {
     libconfig::Config cfg;
     try {
-        // todo make dynamic here
         cfg.readFile(Version::ConfigDir.c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
@@ -33,7 +34,7 @@ bool Config::readCredentials() {
             myfile << Version::SAMPLECONFIG;
             myfile.close();
         } else {
-            std::cout << "error creating file" << std::endl;
+            Logger::error("error creating file");
         }
 
         return false;
@@ -52,11 +53,15 @@ bool Config::readCredentials() {
         // optional parameters
         telegramApiKey = (std::string) cfg.lookup("telegramApiKey");
         chatId = (std::string) cfg.lookup("chatId");
+        telegramSupport = true;
     }
     catch (const libconfig::SettingNotFoundException &nfex) {
         // triggered if setting is missing in config
         if (!(std::strcmp("telegramApiKey", nfex.getPath()) == 0 || std::strcmp("chatId", nfex.getPath()) == 0)) {
             std::cerr << "No '" << nfex.getPath() << "' setting in configuration file." << std::endl;
+        } else {
+            Logger::message("no Telegram support - fields in config not set");
+            telegramSupport = false;
         }
     }
     // check if needed values aren't empty
@@ -83,27 +88,57 @@ bool Config::validateConfig() {
     try {
         // needed parameters
         if (((std::string) cfg.lookup("dynuapikey")).empty()) {
-            Logger::warning("required parameter dynuapikey seems to be empty.");
+            Logger::warning("required parameter \"dynuapikey\" seems to be empty.");
             return false;
         }
         if (((std::string) cfg.lookup("domainid")).empty()) {
-            Logger::warning("required parameter domainid seems to be empty.");
+            Logger::warning("required parameter \"domainid\" seems to be empty.");
             return false;
         }
         if (((std::string) cfg.lookup("domainname")).empty()) {
-            Logger::warning("required parameter domainname seems to be empty.");
+            Logger::warning("required parameter \"domainname\" seems to be empty.");
             return false;
         }
         // optional parameters
         cfg.lookup("telegramApiKey");
         cfg.lookup("chatId");
+        telegramSupport = true;
     }
     catch (const libconfig::SettingNotFoundException &nfex) {
         // triggered if setting is missing in config
         if (!(std::strcmp("telegramApiKey", nfex.getPath()) == 0 || std::strcmp("chatId", nfex.getPath()) == 0)) {
             std::cerr << "No '" << nfex.getPath() << "' setting in configuration file." << std::endl;
             return false;
+        } else {
+            Logger::message("no Telegram support - fields in config not set");
+            telegramSupport = false;
         }
     }
     return true;
 }
+
+bool Config::isTelegramSupported() {
+    return telegramSupport;
+}
+
+const std::string &Config::getDynuapikey() {
+    return dynuapikey;
+}
+
+const std::string &Config::getDomainid() {
+    return domainid;
+}
+
+const std::string &Config::getDomainname() {
+    return domainname;
+}
+
+const std::string &Config::getTelegramApiKey() {
+    return telegramApiKey;
+}
+
+const std::string &Config::getChatId() {
+    return chatId;
+}
+
+Config::Config() = default;
