@@ -18,6 +18,7 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 
 option(BUILD_DOC "Build documentation" OFF) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
+option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
 set(WinBuild false)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -151,12 +152,11 @@ add_library(logger ${LIB_METHOD}
 
 
 SET(SOURCE
-        src/main.cpp
         src/IPRefresher.cpp
         src/Config.cpp
         src/IpHelper.cpp)
 
-add_executable(iprefresher ${SOURCE})
+add_executable(iprefresher src/main.cpp ${SOURCE})
 
 # LINK generated LIBS #
 target_link_libraries(iprefresher api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
@@ -294,3 +294,42 @@ if (BUILD_DOC)
     endif (DOXYGEN_FOUND)
     message("")
 endif (BUILD_DOC)
+
+# Test Cases
+if (TESTS)
+    include(GoogleTest)
+
+    mark_as_advanced(
+            BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+            gmock_build_tests gtest_build_samples gtest_build_tests
+            gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+    )
+
+    enable_testing()
+
+    macro(package_add_test TESTNAME)
+        # create an exectuable in which the tests will be stored
+        add_executable(${TESTNAME} ${ARGN})
+        # link the Google test infrastructure, mocking library, and a default main fuction to
+        target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+        # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
+        gtest_discover_tests(${TESTNAME}
+                WORKING_DIRECTORY ${PROJECT_DIR}
+                EXTRA_ARGS --gtest_output=xml:report.xml -VV
+                PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+                )
+        set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+    endmacro()
+
+    package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
+
+    add_custom_target(build-test
+            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test
+            DEPENDS ${PROJECT_NAME}
+            COMMENT "Packing ${PROJECT_NAME}")
+
+    add_custom_target(build-xml
+            "bin/test1" --gtest_output="xml:report.xml"
+            DEPENDS ${PROJECT_NAME}
+            COMMENT "Packing ${PROJECT_NAME}")
+ENDIF ()
