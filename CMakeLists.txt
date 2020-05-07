@@ -309,10 +309,21 @@ if (TESTS)
         gtest_discover_tests(${TESTNAME}
                 # set a working directory so your project root so that you can find test data via paths relative to the project root
                 WORKING_DIRECTORY ${PROJECT_DIR}
+                EXTRA_ARGS --gtest_output=xml:report.xml -VV
                 PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
                 )
         set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
     endmacro()
 
     package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
+
+    add_custom_target(build-test
+            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test
+            DEPENDS ${PROJECT_NAME}
+            COMMENT "Packing ${PROJECT_NAME}")
+
+    add_custom_target(build-xml
+            "bin/test1" --gtest_output="xml:report.xml"
+            DEPENDS ${PROJECT_NAME}
+            COMMENT "Packing ${PROJECT_NAME}")
 ENDIF ()

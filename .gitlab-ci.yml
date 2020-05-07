@@ -11,7 +11,11 @@ build:
     - cd build
     - make
     - make package
+    - make test
+    - make build-xml
   artifacts:
     paths:
       - "build/bin/*"
       - "build/packages/*"
+    reports:
+      junit: report.xml
