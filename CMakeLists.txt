@@ -18,7 +18,7 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 
 option(BUILD_DOC "Build documentation" OFF) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
-option(TESTS "Build Tests" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
+option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
 set(WinBuild false)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -295,6 +295,7 @@ if (BUILD_DOC)
     message("")
 endif (BUILD_DOC)
 
+# Test Cases
 if (TESTS)
     include(GoogleTest)
 
@@ -310,12 +311,9 @@ if (TESTS)
         # create an exectuable in which the tests will be stored
         add_executable(${TESTNAME} ${ARGN})
         # link the Google test infrastructure, mocking library, and a default main fuction to
-        # the test executable.  Remove g_test_main if writing your own main function.
         target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm api logger ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
-        # gtest_discover_tests replaces gtest_add_tests,
         # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
         gtest_discover_tests(${TESTNAME}
-                # set a working directory so your project root so that you can find test data via paths relative to the project root
                 WORKING_DIRECTORY ${PROJECT_DIR}
                 EXTRA_ARGS --gtest_output=xml:report.xml -VV
                 PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
