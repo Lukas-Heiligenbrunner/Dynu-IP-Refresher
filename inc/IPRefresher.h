@@ -14,7 +14,7 @@ public:
     /**
      * default constructor
      */
-    IPRefresher();
+    IPRefresher() = default;
 
     /**
      * start the service in loop mode

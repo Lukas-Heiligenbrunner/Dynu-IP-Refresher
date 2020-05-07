@@ -7,7 +7,7 @@
 
 #include <climits>
 
-int TelegramAPI::sendMessage(const std::string& text) {
+int TelegramAPI::sendMessage(const std::string &text) {
     Hashmap<std::string, std::string> args;
     args.add("chat_id", chatid);
     args.add("text", text);

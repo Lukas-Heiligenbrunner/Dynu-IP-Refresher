@@ -146,7 +146,8 @@ add_library(logger ${LIB_METHOD}
 SET(SOURCE
         src/main.cpp
         src/IPRefresher.cpp
-        src/Config.cpp)
+        src/Config.cpp
+        src/IpHelper.cpp)
 
 add_executable(iprefresher ${SOURCE})
 

@@ -3,10 +3,10 @@
 //
 
 #include "FileLogger.h"
+#include "IpHelper.h"
 
 #include <fstream>
 #include <iostream>
-#include <climits>
 
 void FileLogger::safeip(std::string ip) {
     std::ofstream out;
@@ -25,8 +25,8 @@ std::string FileLogger::readip() {
 
     in >> ip;
 
-    // when received ip has no : return 0.0.0.0
-    if (ip.find(':') == ULONG_MAX)
+    // when received ip has no . return 0.0.0.0
+    if (!IpHelper::isIpValid(ip))
         return "0.0.0.0";
     else
         return ip;

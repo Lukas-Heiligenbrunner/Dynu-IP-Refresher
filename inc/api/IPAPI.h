@@ -8,7 +8,7 @@
 
 #include <string>
 
-class IPAPI : API{
+class IPAPI : API {
 public:
     /**
      * get global ip of current internet connection

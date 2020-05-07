@@ -25,7 +25,10 @@ public:
      * @param headers header fields
      * @return return string of server
      */
-    std::string request(std::string myurl, bool post, Hashmap<std::string, std::string> &map, std::vector<std::string> &headers);
+    std::string request(std::string myurl,
+                        bool post,
+                        Hashmap<std::string, std::string> &map,
+                        std::vector<std::string> &headers);
 
 private:
     static size_t write_data(void *buffer, size_t size, size_t buffersize, FILE *stream);
