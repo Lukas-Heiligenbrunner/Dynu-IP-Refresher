@@ -109,14 +109,14 @@ else ()
     FIND_PATH(LIBCONFIG++_INCLUDE_DIRS
             NAMES libconfig.h++
             PATHS /usr/include /usr/local/include) # search for libconfig include headers
-    FIND_LIBRARY(LIBCONFIG++_LIBRARY_DIRS
+    FIND_LIBRARY(LIBCONFIG++_LIBRARIES
             NAMES config++
             PATHS /usr/lib /usr/local/lib) # search for actual lib
 
-    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARY_DIRS)
+    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARIES)
         message(STATUS "Fount libconfig!")
         message(STATUS "Using libconfig include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
-        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARY_DIRS}")
+        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARIES}")
     else ()
         message(FATAL_ERROR "Could not find LIBCONFIG")
     endif ()
