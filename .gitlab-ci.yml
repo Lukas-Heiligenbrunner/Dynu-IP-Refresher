@@ -12,7 +12,7 @@ cmake:
     - cmake -S . -B build
   cache:
     paths:
-      - build/
+      - ./
 
 build:
   stage: build
@@ -21,7 +21,7 @@ build:
     - make
   cache:
     paths:
-      - build/
+      - ./
   artifacts:
     paths:
       - "build/bin/*"
@@ -34,7 +34,7 @@ build_package:
     - make package
   cache:
     paths:
-      - build/
+      - ./
   artifacts:
     paths:
       - "build/packages/*"
