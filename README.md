@@ -1,3 +1,4 @@
+[![pipeline status](http://gitlab.heili.eu/lukas/dynuiprefresher/badges/master/pipeline.svg)](http://gitlab.heili.eu/lukas/dynuiprefresher/-/commits/master)
 # DynuIPRefresher
 A lightweight C++ application to setup a service for refreshing a dynamic IP to the Dynu servers. 
 Dynu.com is a free DDns service and provides an API.
