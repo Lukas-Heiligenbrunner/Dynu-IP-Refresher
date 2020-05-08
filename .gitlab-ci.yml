@@ -1,21 +1,41 @@
 image: luki42/dynuiprefresher_build:latest
 
 stages:
+  - cmake
   - build
+  - build_package
+  - test
 
+cmake:
+  stage: cmake
+  script:
+    - cmake -S . -B build
 
 build:
   stage: build
   script:
-    - cmake -S . -B build
     - cd build
     - make
-    - make package
-    - make test
-    - make build-xml
   artifacts:
     paths:
       - "build/bin/*"
+
+
+build_package:
+  stage: build_package
+  script:
+    - cd build
+    - make package
+  artifacts:
+    paths:
       - "build/packages/*"
+
+test:
+  stage: test
+  script:
+    - cd build
+    - make test
+    - make build-xml
+  artifacts:
     reports:
       junit: build/report.xml
