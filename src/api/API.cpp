@@ -1,7 +1,3 @@
-//
-// Created by lukas on 06.04.19.
-//
-
 #include "api/API.h"
 
 #include <sstream>

@@ -1,7 +1,3 @@
-//
-// Created by lukas on 26.10.19.
-//
-
 #include "Logger.h"
 
 #include <sstream>

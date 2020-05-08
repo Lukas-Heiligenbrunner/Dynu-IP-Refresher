@@ -1,7 +1,3 @@
-//
-// Created by lukas on 02.08.19.
-//
-
 #include "IPRefresher.h"
 #include "FileLogger.h"
 #include "api/IPAPI.h"

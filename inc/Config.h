@@ -1,14 +1,14 @@
-//
-// Created by lukas on 11.02.20.
-//
+/**
+ * A static class to manage the configuration file, read/write parameters to it.
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 11.02.2020
+ */
 
 #pragma once
 
 #include <string>
 
-/**
- * A static class to manage the configuration file, read/write parameters to it.
- */
 class Config {
 public:
     /**
@@ -75,11 +75,12 @@ private:
      */
     static bool telegramSupport;
 
+    /**
+     * helper variables for storing keys and ids
+     */
     static std::string dynuapikey;
-
     static std::string domainid; //id of the dynu domain
     static std::string domainname;
-
     static std::string telegramApiKey;
     static std::string chatId;
 };

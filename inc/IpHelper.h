@@ -1,14 +1,14 @@
-//
-// Created by lukas on 07.05.20.
-//
+/**
+ * A helper class for general IP String actions
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 07.05.2020
+ */
 
 #pragma once
 
 #include <string>
 
-/**
- * General helper class for IP actions
- */
 class IpHelper {
 public:
     /**

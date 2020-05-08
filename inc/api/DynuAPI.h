@@ -1,6 +1,9 @@
-//
-// Created by lukas on 18.06.19.
-//
+/**
+ * Dynu API - Refresh the IP
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 18.06.2019
+ */
 
 #pragma once
 
@@ -24,8 +27,18 @@ public:
     void init(const std::string &dynuApiKey, const std::string &domainId, const std::string &domainName);
 
 private:
-    std::string dynuapikey; // Dynu API key
+    /**
+     * Dynu API Key
+     */
+    std::string dynuapikey;
 
-    std::string domainid; //id of the dynu domain
+    /**
+     * Dynu Domain ID
+     */
+    std::string domainid;
+
+    /**
+     * Domain name eg. "mydomain.dynu.net"
+     */
     std::string domainname;
 };

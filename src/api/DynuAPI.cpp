@@ -1,7 +1,3 @@
-//
-// Created by lukas on 18.06.19.
-//
-
 #include "api/DynuAPI.h"
 
 bool DynuAPI::refreshIp(std::string ip) {

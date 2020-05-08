@@ -1,6 +1,9 @@
-//
-// Created by lukas on 18.06.19.
-//
+/**
+ * IPAPI for getting global ip of current network
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 18.06.2019
+ */
 
 #pragma once
 

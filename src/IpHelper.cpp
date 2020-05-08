@@ -1,7 +1,3 @@
-//
-// Created by lukas on 07.05.20.
-//
-
 #include "IpHelper.h"
 
 #include <climits>

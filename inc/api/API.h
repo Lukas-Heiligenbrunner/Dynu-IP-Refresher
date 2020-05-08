@@ -1,6 +1,11 @@
-//
-// Created by lukas on 06.04.19.
-//
+/**
+ * API class
+ * - manages all curl download stuff
+ * - easy POST/GET requests
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 06.04.2019
+ */
 
 #pragma once
 

@@ -1,6 +1,9 @@
-//
-// Created by lukas on 08.05.19.
-//
+/**
+ * Telegram API for sending message to specific chat
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 08.05.2019
+ */
 
 #pragma once
 

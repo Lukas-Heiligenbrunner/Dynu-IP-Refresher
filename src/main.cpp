@@ -1,7 +1,3 @@
-//
-// Created by lukas on 18.06.19.
-//
-
 #include "Version.h"
 #include "IPRefresher.h"
 #include "Logger.h"

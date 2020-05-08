@@ -1,6 +1,10 @@
-//
-// Created by lukas on 26.10.19.
-//
+/**
+ * Fancy console log output format
+ * todo log level support
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 26.10.2019
+ */
 
 #pragma once
 

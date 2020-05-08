@@ -1,7 +1,3 @@
-//
-// Created by lukas on 08.05.19.
-//
-
 #include "api/TelegramAPI.h"
 #include "Logger.h"
 

@@ -1,7 +1,3 @@
-//
-// Created by lukas on 11.02.20.
-//
-
 #include "Config.h"
 #include "Logger.h"
 #include "Version.h"

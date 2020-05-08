@@ -1,6 +1,9 @@
-//
-// Created by lukas on 05.05.19.
-//
+/**
+ * Read and write current ip to a temp file to remember last ip until restart
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 05.05.2019
+ */
 
 #pragma once
 

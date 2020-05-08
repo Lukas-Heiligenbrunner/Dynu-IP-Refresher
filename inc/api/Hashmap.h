@@ -1,6 +1,9 @@
-//
-// Created by lukas on 07.04.19.
-//
+/**
+ * A Hashmap class for easier Key-Value maps
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 07.04.2019
+ */
 
 #pragma once
 

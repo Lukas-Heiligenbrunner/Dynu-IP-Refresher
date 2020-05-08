@@ -1,6 +1,11 @@
-//
-// Created by lukas on 02.08.19.
-//
+/**
+ * IPrefresher library
+ * - start checking ip once
+ * - or in loop mode
+ *
+ * @author Lukas Heiligenbrunner
+ * @date 06.04.2019
+ */
 
 #pragma once
 
