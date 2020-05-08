@@ -6,22 +6,24 @@ stages:
   - build_package
   - test
 
+cache:
+  paths:
+    - build/
+    - src/
+    - inc/
+    - tests/
+    - postinst
+
 cmake:
   stage: cmake
   script:
     - cmake -S . -B build
-  cache:
-    paths:
-      - ./
 
 build:
   stage: build
   script:
     - cd build
     - make
-  cache:
-    paths:
-      - ./
   artifacts:
     paths:
       - "build/bin/*"
@@ -32,9 +34,6 @@ build_package:
   script:
     - cd build
     - make package
-  cache:
-    paths:
-      - ./
   artifacts:
     paths:
       - "build/packages/*"
