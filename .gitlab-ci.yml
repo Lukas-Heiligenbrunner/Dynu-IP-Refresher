@@ -10,12 +10,18 @@ cmake:
   stage: cmake
   script:
     - cmake -S . -B build
+  cache:
+    paths:
+      - build/
 
 build:
   stage: build
   script:
     - cd build
     - make
+  cache:
+    paths:
+      - build/
   artifacts:
     paths:
       - "build/bin/*"
@@ -26,6 +32,9 @@ build_package:
   script:
     - cd build
     - make package
+  cache:
+    paths:
+      - build/
   artifacts:
     paths:
       - "build/packages/*"
