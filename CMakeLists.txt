@@ -19,6 +19,7 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
+option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
 set(WinBuild false)
 
 # helper variables
@@ -172,6 +173,34 @@ add_executable(iprefresher src/main.cpp)
 
 # LINK generated LIBS #
 target_link_libraries(iprefresher dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+
+if (${GUI})
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5PrintSupport REQUIRED)
+    find_package(Qt5Sql REQUIRED)
+    set(QT5_LIBRARIES Qt5::Widgets Qt5::PrintSupport Qt5::Sql)
+
+    set(UI_SOURCES
+            src/gui/mainwindow.ui
+            )
+
+    #
+    # Generate necessary headers from .ui files. (qmake lets `uic` do this job.)
+    # hint from [Cross-platform Qt5 project using cmake](http://stackoverflow.com/questions/21174586/cross-platform-qt5-project-using-cmake)
+    #
+    qt5_wrap_ui(UI_GENERATED_HEADERS ${UI_SOURCES})
+
+    add_executable(iprefresher-gui
+            src/maingui.cpp
+            src/gui/MainWindow.cpp
+            src/gui/MainWindow.h ${UI_GENERATED_HEADERS})
+
+    # LINK generated LIBS #
+    target_link_libraries(iprefresher-gui dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
+endif ()
 
 # setting install targets
 IF (NOT ${WinBuild})
