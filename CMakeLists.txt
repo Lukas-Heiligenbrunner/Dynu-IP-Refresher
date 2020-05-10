@@ -19,8 +19,8 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
-option(GUI "Build GUI elements" OFF) # additional dependencies to QT libraries needed
-set(WinBuild false)
+option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
+set(WinBuild true)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
@@ -99,6 +99,10 @@ if (${WinBuild})
     message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
 
     include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
+
+    if (${GUI})
+        set(CMAKE_PREFIX_PATH "/usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/cmake")
+    endif ()
 else ()
     find_package(CURL REQUIRED)
     if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
@@ -128,6 +132,15 @@ else ()
     endif ()
 
     include_directories(${LIBCONFIG_INCLUDE_DIRS})
+endif ()
+
+if (${GUI})
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5PrintSupport REQUIRED)
+    find_package(Qt5Sql REQUIRED)
 endif ()
 
 message("")
@@ -175,12 +188,6 @@ add_executable(iprefresher src/main.cpp)
 target_link_libraries(iprefresher dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
 if (${GUI})
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-    find_package(Qt5Widgets REQUIRED)
-    find_package(Qt5PrintSupport REQUIRED)
-    find_package(Qt5Sql REQUIRED)
     set(QT5_LIBRARIES Qt5::Widgets Qt5::PrintSupport Qt5::Sql)
 
     set(UI_SOURCES

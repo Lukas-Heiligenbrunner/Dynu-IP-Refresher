@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[]) {
     std::cout << "gui here!" << std::endl;
+    QCoreApplication::addLibraryPath(".");
 
     QApplication a(argc, argv);
     MainWindow w;

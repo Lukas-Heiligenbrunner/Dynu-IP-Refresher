@@ -1,22 +1,24 @@
-#include <inc/api/IPAPI.h>
-#include <inc/IPRefresher.h>
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 
-#include "inc/Config.h"
-#include "inc/Logger.h"
+#include "api/IPAPI.h"
+#include "IPRefresher.h"
+#include "Config.h"
+#include "Logger.h"
+
+#include <thread>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
     // needs to be defined out of scope -- would be termintated after this constructor.
-//    myThread = std::thread([this](){
-//        IPAPI ipapi;
-//        std::string ip = ipapi.getGlobalIp();
-//        Logger::message("Current global IP: " + ip);
-//        std::string msg = "Your current global IP: "+ip;
-//        ui->labelCurrentIP->setText(msg.c_str());
-//    });
+    new std::thread([this]() {
+        IPAPI ipapi;
+        std::string ip = ipapi.getGlobalIp();
+        Logger::message("Current global IP: " + ip);
+        std::string msg = "Your current global IP: " + ip;
+        this->ui->labelCurrentIP->setText(msg.c_str());
+    });
 
 
     if (Config::validateConfig())
@@ -28,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->buttonRefreshIP, SIGNAL(clicked()), this, SLOT(refreshIPBtn()));
 
     connect(this, SIGNAL(appendLogField(QString)), ui->textLog, SLOT(appendPlainText(QString)));
-//    connect(this, SIGNAL(setProgressBarValue(int)), ui->progressmanual, SLOT(setValue(int)));
 }
 
 MainWindow::~MainWindow() {
@@ -54,30 +55,15 @@ void MainWindow::refreshIPBtn() {
     Logger::message("start refreshing Dynu IP.");
     appendLogField("");
     appendLogField("start refreshing Dynu IP.");
-new std::thread([this](){
-    IPRefresher ipr;
-    if (Config::readConfig()) {
-        ipr.checkIPAdress(false);
-    } else {
-        std::cout << "incorrect credentials!" << std::endl;
-    }
+    new std::thread([this]() {
+        IPRefresher ipr;
+        if (Config::readConfig()) {
+            ipr.checkIPAdress(false);
+        } else {
+            std::cout << "incorrect credentials!" << std::endl;
+        }
 
-    Logger::message("Finished refreshing Dynu IP.");
-    appendLogField("Finished refreshing Dynu IP.");
-    delete this;
-});
-//    myThread = std::thread([this](){
-//        IPRefresher ipr;
-//        if (Config::readConfig()) {
-//            ipr.checkIPAdress(false);
-//        } else {
-//            std::cout << "incorrect credentials!" << std::endl;
-//        }
-//
-//        Logger::message("Finished refreshing Dynu IP.");
-//        appendLogField("Finished refreshing Dynu IP.");
-//        ui->textLog->appendPlainText("Finished refreshing Dynu IP.");
-//    });
-
-
+        Logger::message("Finished refreshing Dynu IP.");
+        this->appendLogField("Finished refreshing Dynu IP.");
+    });
 }
