@@ -19,7 +19,7 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
-option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
+option(GUI "Build GUI elements" OFF) # additional dependencies to QT libraries needed
 set(WinBuild false)
 
 # helper variables
@@ -199,7 +199,7 @@ if (${GUI})
             src/gui/MainWindow.h ${UI_GENERATED_HEADERS})
 
     # LINK generated LIBS #
-    target_link_libraries(iprefresher-gui dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
+    target_link_libraries(iprefresher-gui -lpthread dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
 endif ()
 
 # setting install targets
