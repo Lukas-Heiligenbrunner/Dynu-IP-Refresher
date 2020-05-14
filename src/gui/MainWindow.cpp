@@ -58,7 +58,23 @@ void MainWindow::refreshIPBtn() {
     new std::thread([this]() {
         IPRefresher ipr;
         if (Config::readConfig()) {
-            ipr.checkIPAdress(false);
+            int code = ipr.checkIPAdress(false);
+            switch (code) {
+                case IPRefresher_Status_Code::SUCCESS:
+                    appendLogField("successfully refreshed IP!");
+                    break;
+                case IPRefresher_Status_Code::NOREFRESH:
+                    appendLogField("IP is already correct.");
+                    break;
+                case IPRefresher_Status_Code::ERROR_NO_INTERNET:
+                    appendLogField("Error: No Internet connection");
+                    break;
+                case IPRefresher_Status_Code::ERROR:
+                    appendLogField("An error occured while refreshing.");
+                    break;
+                default:
+                    appendLogField("An unknown error code occured");
+            }
         } else {
             std::cout << "incorrect credentials!" << std::endl;
         }

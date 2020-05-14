@@ -9,12 +9,19 @@
 
 #pragma once
 
+namespace IPRefresher_Status_Code {
+    const int SUCCESS = 1;
+    const int ERROR = -1;
+    const int ERROR_NO_INTERNET = -2;
+    const int NOREFRESH = 0;
+}
+
 class IPRefresher {
 public:
     /**
      * refresh ip address on Dynu server
      */
-    void checkIPAdress(bool force);
+    bool checkIPAdress(bool force);
 
     /**
      * default constructor

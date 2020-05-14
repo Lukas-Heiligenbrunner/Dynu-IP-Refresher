@@ -11,23 +11,26 @@
 #include <thread>
 #include <Logger.h>
 
-void IPRefresher::checkIPAdress(bool force) {
+bool IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
-
+    testspace::testi5();
     IPAPI ipapi;
     std::string ip = ipapi.getGlobalIp();
 
     if (ip.empty()) {
         //no internet connection (or other error)
         Logger::warning("no internet connection");
+        return IPRefresher_Status_Code::ERROR_NO_INTERNET;
     } else if (!IpHelper::isIpValid(ip)) {
         // error when ip doesn't contain a :
         Logger::warning("an error occured when getting the global ip");
+        return IPRefresher_Status_Code::ERROR;
     } else {
         std::string oldip = logger.readip();
 
         if (oldip == ip && !force) {
             Logger::message("no change -- ip: " + ip);
+            return IPRefresher_Status_Code::NOREFRESH;
         } else {
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
@@ -43,9 +46,11 @@ void IPRefresher::checkIPAdress(bool force) {
             } else if (!result) {
                 //error
                 Logger::error("failed to write ip to dynu api!");
+                return IPRefresher_Status_Code::ERROR;
             }
 
             logger.safeip(ip);
+            return result ? IPRefresher_Status_Code::SUCCESS : IPRefresher_Status_Code::ERROR;
         }
     }
 }

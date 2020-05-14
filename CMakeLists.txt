@@ -20,7 +20,7 @@ option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
 option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
-set(WinBuild true)
+set(WinBuild false)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
