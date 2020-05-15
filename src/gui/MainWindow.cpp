@@ -8,10 +8,10 @@
 
 #include <thread>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow() : QMainWindow(), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    // needs to be defined out of scope -- would be termintated after this constructor.
+    // needs to be defined with new -- would be termintated after this constructor.
     new std::thread([this]() {
         IPAPI ipapi;
         std::string ip = ipapi.getGlobalIp();
@@ -20,11 +20,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         this->ui->labelCurrentIP->setText(msg.c_str());
     });
 
-
-    if (Config::validateConfig())
-        ui->labelConfig->setText("Config is: OK");
-    else
-        ui->labelConfig->setText("Config is: NOT OK");
+    // set config info label and initial check if config is valid
+    ui->labelConfig->setText(Config::validateConfig() ? "Config is: OK" : "Config is: NOT OK");
 
     connect(ui->buttonCheckConfig, SIGNAL(clicked()), this, SLOT(checkConfigBtn()));
     connect(ui->buttonRefreshIP, SIGNAL(clicked()), this, SLOT(refreshIPBtn()));
@@ -33,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
+    // todo check if disconnects are really necessary
+    disconnect(ui->buttonCheckConfig);
+    disconnect(ui->buttonRefreshIP);
     delete ui;
 }
 
@@ -56,20 +56,19 @@ void MainWindow::refreshIPBtn() {
     appendLogField("");
     appendLogField("start refreshing Dynu IP.");
     new std::thread([this]() {
-        IPRefresher ipr;
         if (Config::readConfig()) {
-            int code = ipr.checkIPAdress(false);
+            int code = IPRefresher::checkIPAdress(false);
             switch (code) {
-                case IPRefresher_Status_Code::SUCCESS:
+                case IPRefresher::Status_Code::SUCCESS:
                     appendLogField("successfully refreshed IP!");
                     break;
-                case IPRefresher_Status_Code::NOREFRESH:
+                case IPRefresher::Status_Code::NOREFRESH:
                     appendLogField("IP is already correct.");
                     break;
-                case IPRefresher_Status_Code::ERROR_NO_INTERNET:
+                case IPRefresher::Status_Code::ERROR_NO_INTERNET:
                     appendLogField("Error: No Internet connection");
                     break;
-                case IPRefresher_Status_Code::ERROR:
+                case IPRefresher::Status_Code::ERROR:
                     appendLogField("An error occured while refreshing.");
                     break;
                 default:

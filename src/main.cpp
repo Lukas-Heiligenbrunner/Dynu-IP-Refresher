@@ -21,15 +21,14 @@ int main(int argc, char *argv[]) {
         } else if (firstarg == "-v" || firstarg == "--version") {
             std::cout << "Version " << Version::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
-            IPRefresher ipr;
             if (Config::readConfig()) {
-                ipr.checkIPAdress(true);
+                IPRefresher::checkIPAdress(true);
             } else {
                 std::cout << "incorrect credentials!" << std::endl;
             }
 
         } else if (firstarg == "-l" || firstarg == "--loop") {
-            IPRefresher(true);
+            IPRefresher::startUpService(true);
         } else if (firstarg == "-c" || firstarg == "--checkconfig") {
             if (Config::validateConfig()) {
                 Logger::message("Config file is OK");
@@ -44,10 +43,9 @@ int main(int argc, char *argv[]) {
             Logger::message("wrong arguments!  -h for help");
         }
     } else {
-        IPRefresher ipr;
         Logger::message("starting check");
         if (Config::readConfig()) {
-            ipr.checkIPAdress(false);
+            IPRefresher::checkIPAdress(false);
         } else {
             std::cout << "incorrect credentials!" << std::endl;
         }
