@@ -217,6 +217,11 @@ IF (NOT ${WinBuild})
     install(TARGETS iprefresher DESTINATION usr/bin)
     # install systemd service and enable it
     install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+
+    if (${GUI})
+        # install binaries
+        install(TARGETS iprefresher-gui DESTINATION usr/bin)
+    endif ()
 ELSE ()
     # INSTALL to Windows SYSTEM #
 
@@ -237,6 +242,17 @@ ELSE ()
             /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libidn2-0.dll
             /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libconfig++-11.dll
             DESTINATION .)
+
+    if (${GUI})
+        # install binaries
+        install(TARGETS iprefresher-gui DESTINATION .)
+
+        # install .dll dependencies
+        # todo check if files exist...
+        # TODO install right dll dependencies here
+        #install(FILES /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcurl-4.dll
+        #        DESTINATION .)
+    endif ()
 ENDIF ()
 
 if (${PACKAGING})
@@ -282,6 +298,7 @@ fi\n"
             SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
             SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
             set(CPACK_RPM_PACKAGE_REQUIRES "libcurl,libconfig")
+            # todo set additional gui dependencies here
         else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
             message(STATUS "not found rpm build tools --> not building rpm")
         endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
@@ -292,6 +309,7 @@ fi\n"
             SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB") # add deb generator
             set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst") # set post inst file
             set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4,libconfig++9v5") # add debian dependencies
+            # todo set additional gui dependencies here
         else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
             message(STATUS "not found  deb build tools --> not building deb")
         endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
