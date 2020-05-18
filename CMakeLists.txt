@@ -18,8 +18,8 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
-option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
-set(WinBuild false)
+option(TESTS "Build Tests" false) # additional dependencies for GTEST - to build tests
+set(WinBuild true)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
@@ -65,7 +65,7 @@ if (${WinBuild})
     # or add_definitions(-DCURL_STATICLIB)
 
     # windows config path is same as executable
-    set(CONFIG_PATH "./iprefresher.cfg")
+    set(CONFIG_PATH "../Common Files/iprefresher/iprefresher.cfg")
 else ()
     set(LIBSUFFIX .so)
     set(SUFFIX "")
@@ -187,6 +187,9 @@ ELSE ()
     # install binary to current folder
     set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
     install(TARGETS iprefresher DESTINATION .)
+
+    # create config directory
+    install(DIRECTORY DESTINATION "../Common\ Files/iprefresher")
 
     # install .dll dependencies
     # todo check if files exist...
