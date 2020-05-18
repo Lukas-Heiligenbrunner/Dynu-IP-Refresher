@@ -205,6 +205,11 @@ if (${GUI})
             src/gui/MainWindow.cpp
             src/gui/MainWindow.h ${UI_GENERATED_HEADERS})
 
+    if (${WinBuild})
+        # hide console window when starting ui on windows
+        set_target_properties(iprefresher-gui PROPERTIES LINK_FLAGS "-mwindows")
+    endif ()
+
     # LINK generated LIBS #
     target_link_libraries(iprefresher-gui -lpthread dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
 endif ()
@@ -231,27 +236,44 @@ ELSE ()
 
     # install .dll dependencies
     # todo check if files exist...
+    SET(LIBBINARYPATH "/usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin")
     install(FILES /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcurl-4.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssh2-1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libstdc++-6.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libgcc_s_seh-1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcrypto-1_1-x64.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssl-1_1-x64.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libwinpthread-1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/zlib1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libidn2-0.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libconfig++-11.dll
+            ${LIBBINARYPATH}/libssh2-1.dll
+            ${LIBBINARYPATH}/libstdc++-6.dll
+            ${LIBBINARYPATH}/libgcc_s_seh-1.dll
+            ${LIBBINARYPATH}/libcrypto-1_1-x64.dll
+            ${LIBBINARYPATH}/libssl-1_1-x64.dll
+            ${LIBBINARYPATH}/libwinpthread-1.dll
+            ${LIBBINARYPATH}/zlib1.dll
+            ${LIBBINARYPATH}/libidn2-0.dll
+            ${LIBBINARYPATH}/libconfig++-11.dll
             DESTINATION .)
 
     if (${GUI})
         # install binaries
+        set_target_properties(iprefresher-gui PROPERTIES SUFFIX ".exe")
         install(TARGETS iprefresher-gui DESTINATION .)
 
         # install .dll dependencies
-        # todo check if files exist...
-        # TODO install right dll dependencies here
-        #install(FILES /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcurl-4.dll
-        #        DESTINATION .)
+        install(FILES
+                ${LIBBINARYPATH}/Qt5Widgets.dll
+                ${LIBBINARYPATH}/Qt5Core.dll
+                ${LIBBINARYPATH}/Qt5Gui.dll
+                ${LIBBINARYPATH}/iconv.dll
+                ${LIBBINARYPATH}/libpcre2-16-0.dll
+                ${LIBBINARYPATH}/libpng16-16.dll
+                ${LIBBINARYPATH}/libharfbuzz-0.dll
+                ${LIBBINARYPATH}/libglib-2.0-0.dll
+                ${LIBBINARYPATH}/libintl-8.dll
+                ${LIBBINARYPATH}/libpcre-1.dll
+                ${LIBBINARYPATH}/libbz2-1.dll
+                ${LIBBINARYPATH}/libfreetype-6.dll
+                DESTINATION .)
+
+        install(FILES
+                /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/qt5/plugins/platforms/qwindows.dll
+                DESTINATION ./platforms
+                )
     endif ()
 ENDIF ()
 
@@ -296,9 +318,19 @@ fi\n"
             message(STATUS "found rpm build executeable --> able to build rpm")
             SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
             SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
-            SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
+            SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+                    "/lib/systemd/system"
+                    "/lib/systemd"
+                    "/lib"
+                    "/usr/local/bin"
+                    "/usr/local") # --> not override existing folders
+
+            # dependency management tested with fedora!
             set(CPACK_RPM_PACKAGE_REQUIRES "libcurl,libconfig")
-            # todo set additional gui dependencies here
+            if (${GUI})
+                # append rpm GUI dependencies (qt5)
+                set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES},qt5-qtbase")
+            endif ()
         else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
             message(STATUS "not found rpm build tools --> not building rpm")
         endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
@@ -308,8 +340,13 @@ fi\n"
             message(STATUS "found deb build tools --> able to build deb")
             SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB") # add deb generator
             set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst") # set post inst file
+
+            # dependency management tested with fedora!
             set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4,libconfig++9v5") # add debian dependencies
-            # todo set additional gui dependencies here
+            if (${GUI})
+                # append debian GUI dependencies (qt5)
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS},qt5-default")
+            endif ()
         else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
             message(STATUS "not found  deb build tools --> not building deb")
         endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
