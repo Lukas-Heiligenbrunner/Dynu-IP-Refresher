@@ -203,7 +203,8 @@ if (${GUI})
     add_executable(iprefresher-gui
             src/maingui.cpp
             src/gui/MainWindow.cpp
-            src/gui/MainWindow.h ${UI_GENERATED_HEADERS})
+            inc/gui/MainWindow.h
+            ${UI_GENERATED_HEADERS})
 
     if (${WinBuild})
         # hide console window when starting ui on windows

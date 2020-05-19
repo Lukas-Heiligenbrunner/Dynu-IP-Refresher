@@ -29,7 +29,14 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    /**
+     * all static initializations of custom gui elements
+     */
+    void initGui();
+
 private slots:
+
     /**
      * executed click handler for config button
      */
@@ -40,7 +47,13 @@ private slots:
      */
     void refreshIPBtn();
 
+    /**
+     * executed click handler for save config btn
+     */
+    void saveConfigBtn();
+
 signals:
+
     /**
      * append a String line to the Log field
      *

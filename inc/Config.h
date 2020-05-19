@@ -19,6 +19,13 @@ public:
     static bool readConfig();
 
     /**
+     * save back configuration to file
+     *
+     * @return success of config write
+     */
+    static bool saveConfig();
+
+    /**
      * validate config file
      *
      * @return validity of config file
@@ -63,12 +70,32 @@ public:
      */
     static const std::string &getChatId();
 
+    /**
+     * set all parameters without telegram support
+     *
+     * @param domainname Dynu Domain name
+     * @param dynuapikey Dynu api key
+     * @param domainid Dynu domain id
+     */
+    static void setValues(const std::string &domainname, const std::string &dynuapikey, const std::string &domainid);
+
+    /**
+     * set all parameters with telegram support
+     *
+     * @param domainname Dynu Domain name
+     * @param dynuapikey Dynu api key
+     * @param domainid Dynu domain id
+     * @param telegramApiKey Telegram api key
+     * @param chatId Telegram chat id
+     */
+    static void setValues(const std::string &domainname, const std::string &dynuapikey, const std::string &domainid,
+                          const std::string &telegramApiKey, const std::string &chatId);
 
 private:
     /**
      * private constructor --> don't allow instance of this class
      */
-    Config();
+    Config() = default;
 
     /**
      * helper variable for managing telegram Support

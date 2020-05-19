@@ -64,6 +64,11 @@ bool Config::readConfig() {
     return !(Config::dynuapikey.empty() || Config::domainid.empty() || Config::domainname.empty());
 }
 
+bool Config::saveConfig() {
+    // todo save config
+    return false;
+}
+
 bool Config::validateConfig() {
     libconfig::Config cfg;
     try {
@@ -137,4 +142,14 @@ const std::string &Config::getChatId() {
     return chatId;
 }
 
-Config::Config() = default;
+void Config::setValues(const std::string &domainname, const std::string &dynuapikey, const std::string &domainid) {
+    Config::domainname = domainname;
+    Config::dynuapikey = dynuapikey;
+    Config::domainid = domainid;
+}
+
+void Config::setValues(const std::string &domainname, const std::string &dynuapikey, const std::string &domainid, const std::string &telegramApiKey, const std::string &chatId) {
+    setValues(domainname, dynuapikey, domainid);
+    Config::telegramApiKey = telegramApiKey;
+    Config::chatId = chatId;
+}
