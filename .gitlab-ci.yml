@@ -50,14 +50,9 @@ test:
   script:
     - cd build
     - make build-test
-    - make build-xml
   artifacts:
     reports:
       junit: build/report.xml
-    paths:
-      - build/
-      - inc/
-      - postinst
   dependencies:
     - build
 

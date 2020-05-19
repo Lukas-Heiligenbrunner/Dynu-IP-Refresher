@@ -353,12 +353,8 @@ if (TESTS)
         package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
 
         add_custom_target(build-test
-                "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test1 test
-                DEPENDS ${PROJECT_NAME}
-                COMMENT "Packing ${PROJECT_NAME}")
-
-        add_custom_target(build-xml
-                "bin/test1" --gtest_output="xml:report.xml"
+                "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test1
+                COMMAND ctest --force-new-ctest-process --gtest_output="xml:report.xml"
                 DEPENDS ${PROJECT_NAME}
                 COMMENT "Packing ${PROJECT_NAME}")
     else ()
