@@ -54,14 +54,15 @@ IPRefresher::IPRefresher(bool loop) {
     if (loop) {
         Logger::message("startup of service");
         Logger::message("Version: " + Version::VERSION);
-        if (Config::readConfig()) {
-            while (true) {
-                Logger::message("starting check");
+
+        while (true) {
+            Logger::message("starting check");
+            if (Config::readConfig()) {
                 checkIPAdress(false);
-                std::this_thread::sleep_for(std::chrono::milliseconds(300000));
+            } else {
+                std::cout << "incorrect credentials!" << std::endl;
             }
-        } else {
-            std::cout << "incorrect credentials!" << std::endl;
+            std::this_thread::sleep_for(std::chrono::milliseconds(300000));
         }
     }
 }
