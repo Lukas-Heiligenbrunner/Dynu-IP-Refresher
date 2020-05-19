@@ -9,7 +9,7 @@ cmake:
   image: luki42/dynuiprefresher_build:latest
   script:
     - cmake -S . -B build
-  cache:
+  artifacts:
     paths:
       - build/
       - inc/
@@ -23,9 +23,6 @@ build:
     - make
   artifacts:
     paths:
-      - "build/bin/*"
-  cache:
-    paths:
       - build/
       - inc/
       - postinst
@@ -38,9 +35,6 @@ build_package:
     - cd build
     - make package
   artifacts:
-    paths:
-      - "build/packages/*"
-  cache:
     paths:
       - build/
       - inc/
@@ -56,7 +50,6 @@ test:
   artifacts:
     reports:
       junit: build/report.xml
-  cache:
     paths:
       - build/
       - inc/
@@ -68,7 +61,7 @@ cmake_win64:
   image: luki42/dynuiprefresher_build:windows
   script:
     - cmake -S . -B build -D WinBuild=ON
-  cache:
+  artifacts:
     paths:
       - build/
       - inc/
@@ -81,9 +74,6 @@ build_win64:
     - make iprefresher
   artifacts:
     paths:
-      - "build/bin/*"
-  cache:
-    paths:
       - build/
       - inc/
 
@@ -95,9 +85,6 @@ build_package_win64:
     - cd build
     - make package
   artifacts:
-    paths:
-      - "build/packages/*"
-  cache:
     paths:
       - build/
       - inc/
