@@ -226,8 +226,10 @@ if (${PACKAGING})
 if [ ! -f ${CONFIG_PATH} ]; then
     cat > ${CONFIG_PATH} <<- EOM
 ${SAMPLECONFIG}EOM
-fi\n"
-                )
+fi
+
+systemctl enable iprefresher.service
+systemctl start iprefresher.service")
 
 
         SET(CPACK_DEB_COMPONENT_INSTALL 1)
