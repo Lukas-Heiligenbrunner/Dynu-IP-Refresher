@@ -49,7 +49,7 @@ test:
   image: luki42/dynuiprefresher_build:latest
   script:
     - cd build
-    - make test
+    - make build-test
     - make build-xml
   artifacts:
     reports:
