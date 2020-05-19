@@ -20,12 +20,14 @@ build:
   image: luki42/dynuiprefresher_build:latest
   script:
     - cd build
-    - make
+    - make iprefresher
   artifacts:
     paths:
       - build/
       - inc/
       - postinst
+  dependencies:
+    - cmake
 
 
 build_package:
@@ -39,6 +41,8 @@ build_package:
       - build/
       - inc/
       - postinst
+  dependencies:
+    - build
 
 test:
   stage: post
@@ -54,6 +58,8 @@ test:
       - build/
       - inc/
       - postinst
+  dependencies:
+    - build
 
 # Windows Build
 cmake_win64:
@@ -76,6 +82,8 @@ build_win64:
     paths:
       - build/
       - inc/
+  dependencies:
+    - cmake_win64
 
 
 build_package_win64:
@@ -88,3 +96,5 @@ build_package_win64:
     paths:
       - build/
       - inc/
+  dependencies:
+    - build_win64
