@@ -342,19 +342,15 @@ if (TESTS)
             # link the Google test infrastructure, mocking library, and a default main fuction to
             target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
             # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
-            gtest_discover_tests(${TESTNAME}
-                    TEST_PREFIX new:
-                    EXTRA_ARGS --gtest_output=xml
-                    XML_OUTPUT_DIR diri
-                    )
+            gtest_discover_tests(${TESTNAME})
 
             add_custom_command(TARGET build-test
                     POST_BUILD
-                    COMMAND "bin/${item}" --gtest_output=xml:${item}-test-report.xml)
+                    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target ${TESTNAME}
+                    COMMAND "bin/${TESTNAME}" --gtest_output=xml:${TESTNAME}-report.xml)
         endmacro()
 
         add_custom_target(build-test
-                "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target ${testTargets}
                 DEPENDS ${PROJECT_NAME}
                 COMMENT "Testing ${PROJECT_NAME}")
 
