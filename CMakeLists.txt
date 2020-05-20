@@ -343,20 +343,23 @@ if (TESTS)
             target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
             # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
             gtest_discover_tests(${TESTNAME}
-                    WORKING_DIRECTORY ${PROJECT_DIR}
-                    EXTRA_ARGS --gtest_output=xml:report.xml -VV
-                    PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+                    TEST_PREFIX new:
+                    EXTRA_ARGS --gtest_output=xml
+                    XML_OUTPUT_DIR diri
                     )
-            set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
+
+            add_custom_command(TARGET build-test
+                    POST_BUILD
+                    COMMAND "bin/${item}" --gtest_output=xml:${item}-test-report.xml)
         endmacro()
+
+        add_custom_target(build-test
+                "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target ${testTargets}
+                DEPENDS ${PROJECT_NAME}
+                COMMENT "Testing ${PROJECT_NAME}")
 
         package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
 
-        add_custom_target(build-test
-                "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test1
-                COMMAND ctest --force-new-ctest-process --gtest_output="xml:report.xml"
-                DEPENDS ${PROJECT_NAME}
-                COMMENT "Packing ${PROJECT_NAME}")
     else ()
         message(STATUS "GTEST environment not found!")
     endif ()

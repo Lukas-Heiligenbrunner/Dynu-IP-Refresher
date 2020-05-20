@@ -52,7 +52,7 @@ test:
     - make build-test
   artifacts:
     reports:
-      junit: build/report.xml
+      junit: build/*.xml
   dependencies:
     - build
 
