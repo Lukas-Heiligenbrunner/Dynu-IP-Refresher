@@ -20,7 +20,7 @@ build:
   image: luki42/dynuiprefresher_build:latest
   script:
     - cd build
-    - make iprefresher
+    - make dynuiprefresher
   artifacts:
     paths:
       - build/
@@ -72,7 +72,7 @@ build_win64:
   image: luki42/dynuiprefresher_build:windows
   script:
     - cd build
-    - make iprefresher
+    - make dynuiprefresher
   artifacts:
     paths:
       - build/
