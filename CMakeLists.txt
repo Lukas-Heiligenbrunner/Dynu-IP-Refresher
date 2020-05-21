@@ -9,7 +9,7 @@
 # for test build gtest needs to be installed.
 
 cmake_minimum_required(VERSION 3.13)
-project(iprefresher DESCRIPTION "Dynu ip refresher")
+project(iprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
 SET(PROJECT_VERSION 1.3.3)
 
 # CONFIGURATION
@@ -18,8 +18,8 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
-option(TESTS "Build Tests" false) # additional dependencies for GTEST - to build tests
-set(WinBuild false)
+option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
+option(WinBuild "cross compile for Windows Platform" OFF)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
@@ -31,6 +31,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # setup winbuild compilers
 if (${WinBuild})
+    message(STATUS "setup Mingw Toolchain for cross compile.")
     set(LIBSUFFIX .dll)
     set(SUFFIX .exe)
 
@@ -40,9 +41,9 @@ if (${WinBuild})
     #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
 
     # cross compilers to use for C and C++
-    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
-    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
+    set(CMAKE_C_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_RC_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-windres)
 
     # target environment on the build host system
     set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX})
@@ -67,6 +68,7 @@ if (${WinBuild})
     # windows config path is same as executable
     set(CONFIG_PATH "std::string(std::getenv(\"USERPROFILE\")) + \"\\\\AppData\\\\Roaming\\\\DynuIPrefresher\\\\\"")
 else ()
+    message(STATUS "using nativ gcc toolchain.")
     set(LIBSUFFIX .so)
     set(SUFFIX "")
 
@@ -74,8 +76,16 @@ else ()
     set(CONFIG_PATH "\"/etc/\"")
 endif ()
 
+# test compiler settings and enable languages here
+message("")
+message(STATUS "Testing the C++ compiler!")
+enable_language(CXX)
+message("")
+message(STATUS "Testing the C compiler!")
+enable_language(C)
 
 # config libs
+message("")
 message(STATUS "Config of Libraries")
 # libcurl
 if (${WinBuild})
@@ -230,8 +240,10 @@ if (${PACKAGING})
 if [ ! -f ${CONFIG_PATH} ]; then
     cat > ${CONFIG_PATH} <<- EOM
 ${SAMPLECONFIG}EOM
-fi\n"
-                )
+fi
+
+systemctl enable iprefresher.service
+systemctl start iprefresher.service")
 
 
         SET(CPACK_DEB_COMPONENT_INSTALL 1)
@@ -315,39 +327,40 @@ endif (BUILD_DOC)
 
 # Test Cases
 if (TESTS)
-    include(GoogleTest)
+    #    include(GoogleTest)
+    message(STATUS "Configuring GTEST")
+    find_package(GTest)
+    if (GTEST_FOUND)
 
-    mark_as_advanced(
-            BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
-            gmock_build_tests gtest_build_samples gtest_build_tests
-            gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
-    )
+        mark_as_advanced(
+                BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+                gmock_build_tests gtest_build_samples gtest_build_tests
+                gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+        )
 
-    enable_testing()
+        enable_testing()
 
-    macro(package_add_test TESTNAME)
-        # create an exectuable in which the tests will be stored
-        add_executable(${TESTNAME} ${ARGN})
-        # link the Google test infrastructure, mocking library, and a default main fuction to
-        target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
-        # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
-        gtest_discover_tests(${TESTNAME}
-                WORKING_DIRECTORY ${PROJECT_DIR}
-                EXTRA_ARGS --gtest_output=xml:report.xml -VV
-                PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
-                )
-        set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
-    endmacro()
+        macro(package_add_test TESTNAME)
+            # create an exectuable in which the tests will be stored
+            add_executable(${TESTNAME} ${ARGN})
+            # link the Google test infrastructure, mocking library, and a default main fuction to
+            target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+            # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
+            gtest_discover_tests(${TESTNAME})
 
-    package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
+            add_custom_command(TARGET build-test
+                    POST_BUILD
+                    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target ${TESTNAME}
+                    COMMAND "bin/${TESTNAME}" --gtest_output=xml:${TESTNAME}-report.xml)
+        endmacro()
 
-    add_custom_target(build-test
-            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+        add_custom_target(build-test
+                DEPENDS ${PROJECT_NAME}
+                COMMENT "Testing ${PROJECT_NAME}")
 
-    add_custom_target(build-xml
-            "bin/test1" --gtest_output="xml:report.xml"
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+        package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
+
+    else ()
+        message(STATUS "GTEST environment not found!")
+    endif ()
 ENDIF ()

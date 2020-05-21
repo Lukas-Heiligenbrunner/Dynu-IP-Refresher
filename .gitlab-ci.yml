@@ -1,49 +1,95 @@
-image: luki42/dynuiprefresher_build:latest
-
 stages:
   - cmake
   - build
-  - build_package
-  - test
+  - post
 
-cache:
-  paths:
-    - build/
-    - src/
-    - inc/
-    - tests/
-    - postinst
-
+# Unix Build
 cmake:
   stage: cmake
+  image: luki42/dynuiprefresher_build:latest
   script:
     - cmake -S . -B build
+  artifacts:
+    paths:
+      - build/
+      - inc/
+      - postinst
 
 build:
   stage: build
+  image: luki42/dynuiprefresher_build:latest
   script:
     - cd build
-    - make
+    - make iprefresher
   artifacts:
     paths:
-      - "build/bin/*"
+      - build/
+      - inc/
+      - postinst
+  dependencies:
+    - cmake
 
 
 build_package:
-  stage: build_package
+  stage: post
+  image: luki42/dynuiprefresher_build:latest
   script:
     - cd build
     - make package
   artifacts:
     paths:
-      - "build/packages/*"
+      - build/
+      - inc/
+      - postinst
+  dependencies:
+    - build
 
 test:
-  stage: test
+  stage: post
+  image: luki42/dynuiprefresher_build:latest
   script:
     - cd build
-    - make test
-    - make build-xml
+    - make build-test
   artifacts:
     reports:
-      junit: build/report.xml
+      junit: build/*.xml
+  dependencies:
+    - build
+
+# Windows Build
+cmake_win64:
+  stage: cmake
+  image: luki42/dynuiprefresher_build:windows
+  script:
+    - cmake -S . -B build -D WinBuild=ON
+  artifacts:
+    paths:
+      - build/
+      - inc/
+
+build_win64:
+  stage: build
+  image: luki42/dynuiprefresher_build:windows
+  script:
+    - cd build
+    - make iprefresher
+  artifacts:
+    paths:
+      - build/
+      - inc/
+  dependencies:
+    - cmake_win64
+
+
+build_package_win64:
+  stage: post
+  image: luki42/dynuiprefresher_build:windows
+  script:
+    - cd build
+    - make package
+  artifacts:
+    paths:
+      - build/
+      - inc/
+  dependencies:
+    - build_win64
