@@ -9,7 +9,7 @@
 # for test build gtest needs to be installed.
 
 cmake_minimum_required(VERSION 3.13)
-project(iprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
+project(dynuiprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
 SET(PROJECT_VERSION 1.3.3)
 
 # CONFIGURATION
@@ -24,6 +24,7 @@ option(WinBuild "cross compile for Windows Platform" OFF)
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
 string(TIMESTAMP TIMESTAMP_NOW "%d.%m.%Y")
+SET(Application_Name "dynuiprefresher")
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -142,7 +143,7 @@ endif ()
 message("")
 
 #read sample config
-FILE(READ ${CMAKE_SOURCE_DIR}/config/iprefresher.cfg SAMPLECONFIG)
+FILE(READ ${CMAKE_SOURCE_DIR}/config/dynuiprefresher.cfg SAMPLECONFIG)
 #add version header
 FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
         "/**
@@ -160,7 +161,7 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
 namespace Version {
   const std::string VERSION = \"${PROJECT_VERSION}\";
   const std::string ConfigDir = ${CONFIG_PATH};
-  const std::string ConfName = \"iprefresher.cfg\";
+  const std::string ConfName = \"${Application_Name}.cfg\";
   const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
 }"
         )
@@ -171,7 +172,7 @@ add_library(api ${LIB_METHOD}
         src/api/DynuAPI.cpp
         src/api/IPAPI.cpp)
 
-add_library(dynuiprefresher ${LIB_METHOD}
+add_library(libdynuiprefresher ${LIB_METHOD}
         src/IPRefresher.cpp
         src/Config.cpp
         src/IpHelper.cpp
@@ -179,28 +180,25 @@ add_library(dynuiprefresher ${LIB_METHOD}
         src/Logger.cpp
         )
 
-add_executable(iprefresher src/main.cpp)
+add_executable(${Application_Name} src/main.cpp)
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+target_link_libraries(${Application_Name} libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
 # setting install targets
 IF (NOT ${WinBuild})
     # INSTALL to Linux SYSTEM #
 
     # install binaries
-    install(TARGETS iprefresher DESTINATION usr/bin)
+    install(TARGETS ${Application_Name} DESTINATION usr/bin)
     # install systemd service and enable it
-    install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+    install(FILES service/${Application_Name}.service DESTINATION lib/systemd/system)
 ELSE ()
     # INSTALL to Windows SYSTEM #
 
     # install binary to current folder
-    set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
-    install(TARGETS iprefresher DESTINATION .)
-
-    # create config directory
-    install(DIRECTORY DESTINATION "../Common\ Files/iprefresher")
+    set_target_properties(${Application_Name} PROPERTIES SUFFIX ".exe")
+    install(TARGETS ${Application_Name} DESTINATION .)
 
     # install .dll dependencies
     # todo check if files exist...
@@ -242,8 +240,8 @@ if [ ! -f ${CONFIG_PATH} ]; then
 ${SAMPLECONFIG}EOM
 fi
 
-systemctl enable iprefresher.service
-systemctl start iprefresher.service")
+systemctl enable ${Application_Name}.service
+systemctl start ${Application_Name}.service")
 
 
         SET(CPACK_DEB_COMPONENT_INSTALL 1)
@@ -295,8 +293,8 @@ systemctl start iprefresher.service")
 
     add_custom_target(build-packages
             "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+            DEPENDS ${Application_Name}
+            COMMENT "Packing ${Application_Name}")
     message("")
 ENDIF ()
 
@@ -344,7 +342,7 @@ if (TESTS)
             # create an exectuable in which the tests will be stored
             add_executable(${TESTNAME} ${ARGN})
             # link the Google test infrastructure, mocking library, and a default main fuction to
-            target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+            target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
             # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
             gtest_discover_tests(${TESTNAME})
 
