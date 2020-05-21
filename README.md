@@ -15,6 +15,22 @@ Furthermore, you can optionally specify a Telegram API key and a Chat ID if you 
 To enable and start the service: 
 `systemctl enable iprefresher.service` and `systemctl start iprefresher.service`
 
+## Usage
+First of all configure the right keys in the `/etc/iprefresher.cfg` or `%appdata%\DynuIpRefresher\iprefresher.cfg` config file.
+
+Afterwards use the following options: 
+
+```
+help page: 
+[-h] [--help]  print this help page
+[-v] [--version] print the software version
+[-f] [--force] force refresh of ip
+[-l] [--loop] infinite loop to refresh ip every five minutes
+[-c] [--checkconfig] validate configuration
+[-ip] [--currentip] get current global ip
+[no argument] normal ip check and refresh
+```
+
 
 ## Build
 ## Basic Build
