@@ -66,14 +66,14 @@ if (${WinBuild})
     # or add_definitions(-DCURL_STATICLIB)
 
     # windows config path is same as executable
-    set(CONFIG_PATH "./iprefresher.cfg")
+    set(CONFIG_PATH "std::string(std::getenv(\"USERPROFILE\")) + \"\\\\AppData\\\\Roaming\\\\DynuIPrefresher\\\\\"")
 else ()
     message(STATUS "using nativ gcc toolchain.")
     set(LIBSUFFIX .so)
     set(SUFFIX "")
 
     # set /etc/ config path
-    set(CONFIG_PATH "/etc/iprefresher.cfg")
+    set(CONFIG_PATH "\"/etc/\"")
 endif ()
 
 # test compiler settings and enable languages here
@@ -159,7 +159,8 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
 
 namespace Version {
   const std::string VERSION = \"${PROJECT_VERSION}\";
-  const std::string ConfigDir = \"${CONFIG_PATH}\";
+  const std::string ConfigDir = ${CONFIG_PATH};
+  const std::string ConfName = \"iprefresher.cfg\";
   const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
 }"
         )
@@ -197,6 +198,9 @@ ELSE ()
     # install binary to current folder
     set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
     install(TARGETS iprefresher DESTINATION .)
+
+    # create config directory
+    install(DIRECTORY DESTINATION "../Common\ Files/iprefresher")
 
     # install .dll dependencies
     # todo check if files exist...
