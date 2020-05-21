@@ -9,7 +9,7 @@
 # for test build gtest needs to be installed.
 
 cmake_minimum_required(VERSION 3.13)
-project(DynuIpRefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
+project(dynuiprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
 SET(PROJECT_VERSION 1.3.3)
 
 # CONFIGURATION
@@ -293,8 +293,8 @@ systemctl start ${Application_Name}.service")
 
     add_custom_target(build-packages
             "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+            DEPENDS ${Application_Name}
+            COMMENT "Packing ${Application_Name}")
     message("")
 ENDIF ()
 
