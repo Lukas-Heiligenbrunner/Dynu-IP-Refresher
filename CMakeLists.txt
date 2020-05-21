@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.13)
 project(dynuiprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
-SET(PROJECT_VERSION 1.3.3)
+SET(PROJECT_VERSION 1.3.4)
 
 # CONFIGURATION
 SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
