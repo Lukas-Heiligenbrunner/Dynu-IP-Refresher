@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <libconfig.h++>
+#include <sys/stat.h>
 
 std::string Config::dynuapikey;
 std::string Config::domainid; //id of the dynu domain
@@ -19,13 +20,38 @@ bool Config::telegramSupport;
 bool Config::readConfig() {
     libconfig::Config cfg;
     try {
-        cfg.readFile(Version::ConfigDir.c_str());
+        cfg.readFile(std::string(Version::ConfigDir + Version::ConfName).c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
         std::cout << "I/O error while reading config file." << std::endl << "creating new config file!" << std::endl;
 
+        // check if config folder exists
+        struct stat info{};
+
+        if (stat(Version::ConfigDir.c_str(), &info) != 0) {
+            Logger::warning("The config folder doesn't exist. Trying to create it.");
+
+#ifdef __unix
+            int check = mkdir(Version::ConfigDir.c_str(), 777);
+#else
+            int check = mkdir(Version::ConfigDir.c_str());
+#endif
+
+            // check if directory is created or not
+            if (!check)
+                Logger::message("config directory successfully created. ");
+            else
+                Logger::error("unable to create config directory.");
+
+        } else if (info.st_mode & S_IFDIR) {
+            Logger::debug("config directory exists already");
+        } else {
+            Logger::error("A file exists with the same name as the config dir should be");
+        }
+
+
         std::ofstream myfile;
-        myfile.open(Version::ConfigDir);
+        myfile.open(Version::ConfigDir + Version::ConfName);
         if (myfile.is_open()) {
             myfile << Version::SAMPLECONFIG;
             myfile.close();

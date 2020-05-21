@@ -19,7 +19,7 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" false) # additional dependencies for GTEST - to build tests
-set(WinBuild true)
+set(WinBuild false)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
@@ -65,13 +65,13 @@ if (${WinBuild})
     # or add_definitions(-DCURL_STATICLIB)
 
     # windows config path is same as executable
-    set(CONFIG_PATH "../Common Files/iprefresher/iprefresher.cfg")
+    set(CONFIG_PATH "std::string(std::getenv(\"USERPROFILE\")) + \"\\\\AppData\\\\Roaming\\\\DynuIPrefresher\\\\\"")
 else ()
     set(LIBSUFFIX .so)
     set(SUFFIX "")
 
     # set /etc/ config path
-    set(CONFIG_PATH "/etc/iprefresher.cfg")
+    set(CONFIG_PATH "\"/etc/\"")
 endif ()
 
 
@@ -149,7 +149,8 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
 
 namespace Version {
   const std::string VERSION = \"${PROJECT_VERSION}\";
-  const std::string ConfigDir = \"${CONFIG_PATH}\";
+  const std::string ConfigDir = ${CONFIG_PATH};
+  const std::string ConfName = \"iprefresher.cfg\";
   const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
 }"
         )
