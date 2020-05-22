@@ -99,7 +99,7 @@ if (${WinBuild})
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
     message(STATUS "")
 
-    include_directories(${CURL_INCLUDE_DIRS} inc)
+    include_directories(${CURL_INCLUDE_DIRS})
 
     # configure libconfig
     FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
@@ -108,7 +108,7 @@ if (${WinBuild})
     message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
     message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
 
-    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
+    include_directories(${LIBCONFIG++_INCLUDE_DIRS})
 else ()
     find_package(CURL REQUIRED)
     if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
@@ -118,7 +118,7 @@ else ()
     else ()
         message(FATAL_ERROR "Could not find CURL")
     endif ()
-    include_directories(${CURL_INCLUDE_DIR} inc)
+    include_directories(${CURL_INCLUDE_DIR})
 
     message("")
     # libconfig
@@ -139,6 +139,8 @@ else ()
 
     include_directories(${LIBCONFIG_INCLUDE_DIRS})
 endif ()
+
+include_directories(inc)
 
 message("")
 
