@@ -1,4 +1,4 @@
-#include "Version.h"
+#include "StaticData.h"
 #include "IPRefresher.h"
 #include "Logger.h"
 #include "Config.h"
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
                       << "[-ip] [--currentip] get current global ip" << std::endl
                       << "[no argument] normal ip check and refresh" << std::endl;
         } else if (firstarg == "-v" || firstarg == "--version") {
-            std::cout << "Version " << Version::VERSION << std::endl;
+            std::cout << "Version " << StaticData::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
             if (Config::readConfig()) {
                 IPRefresher::checkIPAdress(true);

@@ -9,11 +9,27 @@ I'm providing executables for Debian/Ubuntu (.deb) and RHEL/Debian (.rpm).
 But you can still compile the code my your own (see build section).
 
 ## Configuration
-There is a configuration file `/etc/iprefresher.cfg` where you have to specify the DYNU API key (get it from their homepage), the domainid and your domain.
+There is a configuration file `/etc/dynuiprefresher.cfg` where you have to specify the DYNU API key (get it from their homepage), the domainid and your domain.
 Furthermore, you can optionally specify a Telegram API key and a Chat ID if you want to be notfied when your local ip changes.
 
 To enable and start the service: 
-`systemctl enable iprefresher.service` and `systemctl start iprefresher.service`
+`systemctl enable dynuiprefresher.service` and `systemctl start dynuiprefresher.service`
+
+## Usage
+First of all configure the right keys in the `/etc/dynuiprefresher.cfg` or `%appdata%\DynuIpRefresher\dynuiprefresher.cfg` config file.
+
+Afterwards use the following options: 
+
+```
+help page: 
+[-h] [--help]  print this help page
+[-v] [--version] print the software version
+[-f] [--force] force refresh of ip
+[-l] [--loop] infinite loop to refresh ip every five minutes
+[-c] [--checkconfig] validate configuration
+[-ip] [--currentip] get current global ip
+[no argument] normal ip check and refresh
+```
 
 
 ## Build

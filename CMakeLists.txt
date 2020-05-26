@@ -9,8 +9,8 @@
 # for test build gtest needs to be installed.
 
 cmake_minimum_required(VERSION 3.13)
-project(iprefresher DESCRIPTION "Dynu ip refresher")
-SET(PROJECT_VERSION 1.3.3)
+project(dynuiprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
+SET(PROJECT_VERSION 1.3.4)
 
 # CONFIGURATION
 SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
@@ -20,11 +20,12 @@ option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
 option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
-set(WinBuild false)
+option(WinBuild "cross compile for Windows Platform" OFF)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
 string(TIMESTAMP TIMESTAMP_NOW "%d.%m.%Y")
+SET(Application_Name "dynuiprefresher")
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -32,6 +33,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # setup winbuild compilers
 if (${WinBuild})
+    message(STATUS "setup Mingw Toolchain for cross compile.")
     set(LIBSUFFIX .dll)
     set(SUFFIX .exe)
 
@@ -41,9 +43,9 @@ if (${WinBuild})
     #set(TOOLCHAIN_PREFIX i686-w64-mingw32)
 
     # cross compilers to use for C and C++
-    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
-    set(CMAKE_RC_COMPILER ${TOOLCHAIN_PREFIX}-windres)
+    set(CMAKE_C_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_RC_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-windres)
 
     # target environment on the build host system
     set(CMAKE_FIND_ROOT_PATH /usr/${TOOLCHAIN_PREFIX})
@@ -65,18 +67,31 @@ if (${WinBuild})
     # or set(CMAKE_CXX_STANDARD_LIBRARIES -lcurl -lpthread -static-libgcc -static-libstdc++ -lcrypto -lssl -lws2_32 -static -DCURL_STATICLIB)
     # or add_definitions(-DCURL_STATICLIB)
 
-    # windows config path is same as executable
-    set(CONFIG_PATH "./iprefresher.cfg")
+    # windows config path is in %appdata% folder of user
+    set(CONFIG_PATH "std::string(std::getenv(\"USERPROFILE\")) + \"\\\\AppData\\\\Roaming\\\\DynuIPrefresher\\\\\"")
+    # temp file is also stored in appdata folder
+    set(TempFilePath "std::string(std::getenv(\"USERPROFILE\")) + \"\\\\AppData\\\\Roaming\\\\DynuIPrefresher\\\\\"")
 else ()
+    message(STATUS "using nativ gcc toolchain.")
     set(LIBSUFFIX .so)
     set(SUFFIX "")
 
-    # set /etc/ config path
-    set(CONFIG_PATH "/etc/iprefresher.cfg")
+    # set linux config path
+    set(CONFIG_PATH "\"/etc/\"")
+    # set path of temp file
+    set(TempFilePath "\"/var/tmp/\"")
 endif ()
 
+# test compiler settings and enable languages here
+message("")
+message(STATUS "Testing the C++ compiler!")
+enable_language(CXX)
+message("")
+message(STATUS "Testing the C compiler!")
+enable_language(C)
 
 # config libs
+message("")
 message(STATUS "Config of Libraries")
 # libcurl
 if (${WinBuild})
@@ -89,7 +104,7 @@ if (${WinBuild})
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
     message(STATUS "")
 
-    include_directories(${CURL_INCLUDE_DIRS} inc)
+    include_directories(${CURL_INCLUDE_DIRS})
 
     # configure libconfig
     FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
@@ -98,11 +113,11 @@ if (${WinBuild})
     message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
     message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
 
-    include_directories(${LIBCONFIG++_INCLUDE_DIRS} inc)
-
     if (${GUI})
         set(CMAKE_PREFIX_PATH "/usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/cmake")
     endif ()
+
+    include_directories(${LIBCONFIG++_INCLUDE_DIRS})
 else ()
     find_package(CURL REQUIRED)
     if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
@@ -112,7 +127,7 @@ else ()
     else ()
         message(FATAL_ERROR "Could not find CURL")
     endif ()
-    include_directories(${CURL_INCLUDE_DIR} inc)
+    include_directories(${CURL_INCLUDE_DIR})
 
     message("")
     # libconfig
@@ -134,6 +149,7 @@ else ()
     include_directories(${LIBCONFIG_INCLUDE_DIRS})
 endif ()
 
+
 if (${GUI})
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -143,14 +159,16 @@ if (${GUI})
     find_package(Qt5Sql REQUIRED)
 endif ()
 
+include_directories(inc)
+
 message("")
 
 #read sample config
-FILE(READ ${CMAKE_SOURCE_DIR}/config/iprefresher.cfg SAMPLECONFIG)
-#add version header
-FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
+FILE(READ ${CMAKE_SOURCE_DIR}/config/dynuiprefresher.cfg SAMPLECONFIG)
+#add StaticData header
+FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/StaticData.h
         "/**
- * Version header to store Version, Config dir and a Sample config
+ * StaticData header to store Version, Config dir and a Sample config
  * Do not edit this file manually, it is generated by the cmake script!
  *
  * @author Lukas Heiligenbrunner
@@ -161,9 +179,11 @@ FILE(WRITE ${CMAKE_SOURCE_DIR}/inc/Version.h
 
 #include <string>
 
-namespace Version {
+namespace StaticData {
   const std::string VERSION = \"${PROJECT_VERSION}\";
-  const std::string ConfigDir = \"${CONFIG_PATH}\";
+  const std::string TempFilePath = ${TempFilePath};
+  const std::string ConfigDir = ${CONFIG_PATH};
+  const std::string ConfName = \"${Application_Name}.cfg\";
   const std::string SAMPLECONFIG = R\"(${SAMPLECONFIG})\";
 }"
         )
@@ -174,7 +194,7 @@ add_library(api ${LIB_METHOD}
         src/api/DynuAPI.cpp
         src/api/IPAPI.cpp)
 
-add_library(dynuiprefresher ${LIB_METHOD}
+add_library(libdynuiprefresher ${LIB_METHOD}
         src/IPRefresher.cpp
         src/Config.cpp
         src/IpHelper.cpp
@@ -182,10 +202,10 @@ add_library(dynuiprefresher ${LIB_METHOD}
         src/Logger.cpp
         )
 
-add_executable(iprefresher src/main.cpp)
+add_executable(${Application_Name} src/main.cpp)
 
 # LINK generated LIBS #
-target_link_libraries(iprefresher dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+target_link_libraries(${Application_Name} libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
 if (${GUI})
     set(QT5_LIBRARIES Qt5::Widgets Qt5::PrintSupport Qt5::Sql)
@@ -220,9 +240,9 @@ IF (NOT ${WinBuild})
     # INSTALL to Linux SYSTEM #
 
     # install binaries
-    install(TARGETS iprefresher DESTINATION usr/bin)
+    install(TARGETS ${Application_Name} DESTINATION usr/bin)
     # install systemd service and enable it
-    install(FILES service/iprefresher.service DESTINATION lib/systemd/system)
+    install(FILES service/${Application_Name}.service DESTINATION lib/systemd/system)
 
     if (${GUI})
         # install binaries
@@ -232,8 +252,8 @@ ELSE ()
     # INSTALL to Windows SYSTEM #
 
     # install binary to current folder
-    set_target_properties(iprefresher PROPERTIES SUFFIX ".exe")
-    install(TARGETS iprefresher DESTINATION .)
+    set_target_properties(${Application_Name} PROPERTIES SUFFIX ".exe")
+    install(TARGETS ${Application_Name} DESTINATION .)
 
     # install .dll dependencies
     # todo check if files exist...
@@ -301,8 +321,10 @@ if (${PACKAGING})
 if [ ! -f ${CONFIG_PATH} ]; then
     cat > ${CONFIG_PATH} <<- EOM
 ${SAMPLECONFIG}EOM
-fi\n"
-                )
+fi
+
+systemctl enable ${Application_Name}.service
+systemctl start ${Application_Name}.service")
 
 
         SET(CPACK_DEB_COMPONENT_INSTALL 1)
@@ -371,8 +393,8 @@ fi\n"
 
     add_custom_target(build-packages
             "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target package
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+            DEPENDS ${Application_Name}
+            COMMENT "Packing ${Application_Name}")
     message("")
 ENDIF ()
 
@@ -403,39 +425,40 @@ endif (BUILD_DOC)
 
 # Test Cases
 if (TESTS)
-    include(GoogleTest)
+    #    include(GoogleTest)
+    message(STATUS "Configuring GTEST")
+    find_package(GTest)
+    if (GTEST_FOUND)
 
-    mark_as_advanced(
-            BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
-            gmock_build_tests gtest_build_samples gtest_build_tests
-            gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
-    )
+        mark_as_advanced(
+                BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
+                gmock_build_tests gtest_build_samples gtest_build_tests
+                gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
+        )
 
-    enable_testing()
+        enable_testing()
 
-    macro(package_add_test TESTNAME)
-        # create an exectuable in which the tests will be stored
-        add_executable(${TESTNAME} ${ARGN})
-        # link the Google test infrastructure, mocking library, and a default main fuction to
-        target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
-        # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
-        gtest_discover_tests(${TESTNAME}
-                WORKING_DIRECTORY ${PROJECT_DIR}
-                EXTRA_ARGS --gtest_output=xml:report.xml -VV
-                PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
-                )
-        set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
-    endmacro()
+        macro(package_add_test TESTNAME)
+            # create an exectuable in which the tests will be stored
+            add_executable(${TESTNAME} ${ARGN})
+            # link the Google test infrastructure, mocking library, and a default main fuction to
+            target_link_libraries(${TESTNAME} gtest gtest_main -lpthread -lm libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+            # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
+            gtest_discover_tests(${TESTNAME})
 
-    package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
+            add_custom_command(TARGET build-test
+                    POST_BUILD
+                    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target ${TESTNAME}
+                    COMMAND "bin/${TESTNAME}" --gtest_output=xml:${TESTNAME}-report.xml)
+        endmacro()
 
-    add_custom_target(build-test
-            "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+        add_custom_target(build-test
+                DEPENDS ${PROJECT_NAME}
+                COMMENT "Testing ${PROJECT_NAME}")
 
-    add_custom_target(build-xml
-            "bin/test1" --gtest_output="xml:report.xml"
-            DEPENDS ${PROJECT_NAME}
-            COMMENT "Packing ${PROJECT_NAME}")
+        package_add_test(test1 tests/UnitTest.cpp ${SOURCE})
+
+    else ()
+        message(STATUS "GTEST environment not found!")
+    endif ()
 ENDIF ()
