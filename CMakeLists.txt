@@ -20,7 +20,7 @@ option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
 option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
-option(WinBuild "cross compile for Windows Platform" OFF)
+option(WinBuild "cross compile for Windows Platform" ON)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
@@ -220,7 +220,7 @@ if (${GUI})
     #
     qt5_wrap_ui(UI_GENERATED_HEADERS ${UI_SOURCES})
 
-    add_executable(iprefresher-gui
+    add_executable(${Application_Name}-gui
             src/maingui.cpp
             src/gui/MainWindow.cpp
             inc/gui/MainWindow.h
@@ -228,11 +228,11 @@ if (${GUI})
 
     if (${WinBuild})
         # hide console window when starting ui on windows
-        set_target_properties(iprefresher-gui PROPERTIES LINK_FLAGS "-mwindows")
+        set_target_properties(${Application_Name}-gui PROPERTIES LINK_FLAGS "-mwindows")
     endif ()
 
     # LINK generated LIBS #
-    target_link_libraries(iprefresher-gui -lpthread dynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
+    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
 endif ()
 
 # setting install targets
@@ -240,20 +240,32 @@ IF (NOT ${WinBuild})
     # INSTALL to Linux SYSTEM #
 
     # install binaries
-    install(TARGETS ${Application_Name} DESTINATION usr/bin)
+    install(
+            TARGETS ${Application_Name}
+            DESTINATION usr/bin
+            COMPONENT ${Application_Name})
     # install systemd service and enable it
-    install(FILES service/${Application_Name}.service DESTINATION lib/systemd/system)
+    install(
+            FILES service/${Application_Name}.service
+            DESTINATION lib/systemd/system
+            COMPONENT ${Application_Name})
 
     if (${GUI})
         # install binaries
-        install(TARGETS iprefresher-gui DESTINATION usr/bin)
+        install(
+                TARGETS ${Application_Name}-gui
+                DESTINATION usr/bin
+                COMPONENT ${Application_Name}gui)
     endif ()
 ELSE ()
     # INSTALL to Windows SYSTEM #
 
     # install binary to current folder
     set_target_properties(${Application_Name} PROPERTIES SUFFIX ".exe")
-    install(TARGETS ${Application_Name} DESTINATION .)
+    install(
+            TARGETS ${Application_Name}
+            DESTINATION .
+            COMPONENT ${Application_Name})
 
     # install .dll dependencies
     # todo check if files exist...
@@ -268,12 +280,16 @@ ELSE ()
             ${LIBBINARYPATH}/zlib1.dll
             ${LIBBINARYPATH}/libidn2-0.dll
             ${LIBBINARYPATH}/libconfig++-11.dll
-            DESTINATION .)
+            DESTINATION .
+            COMPONENT ${Application_Name})
 
     if (${GUI})
         # install binaries
-        set_target_properties(iprefresher-gui PROPERTIES SUFFIX ".exe")
-        install(TARGETS iprefresher-gui DESTINATION .)
+        set_target_properties(${Application_Name}-gui PROPERTIES SUFFIX ".exe")
+        install(
+                TARGETS ${Application_Name}-gui
+                DESTINATION .
+                COMPONENT ${Application_Name}gui)
 
         # install .dll dependencies
         install(FILES
@@ -289,12 +305,13 @@ ELSE ()
                 ${LIBBINARYPATH}/libpcre-1.dll
                 ${LIBBINARYPATH}/libbz2-1.dll
                 ${LIBBINARYPATH}/libfreetype-6.dll
-                DESTINATION .)
+                DESTINATION .
+                COMPONENT ${Application_Name}gui)
 
         install(FILES
                 /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/qt5/plugins/platforms/qwindows.dll
                 DESTINATION ./platforms
-                )
+                COMPONENT ${Application_Name}gui)
     endif ()
 ENDIF ()
 
@@ -384,9 +401,37 @@ systemctl start ${Application_Name}.service")
         set(CPACK_GENERATOR NSIS)
         message(STATUS "Using NSIS Package build.")
 
-        set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
+        set(CPACK_NSIS_EXECUTABLES_DIRECTORY "DynuIpRefresher")
         set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
         SET(CPACK_NSIS_MODIFY_PATH ON)
+        set(CPACK_NSIS_MENU_LINKS
+                "${Application_Name}.exe" "DynuIpRefresher Console"
+                "${Application_Name}-gui.exe" "DynuIpRefresher GUI")
+
+        # varnames need uppercase strings
+        string(TOUPPER ${Application_Name} APPLICATION_NAME_UPPER)
+        # Define components and their display names
+        set (CPACK_COMPONENTS_ALL ${Application_Name} ${Application_Name}gui)
+        set (CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_DISPLAY_NAME "Dynu IP Refresher Console")
+        set (CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_DISPLAY_NAME "Dynu IP Refresher GUI")
+
+        # Human readable component descriptions
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_DESCRIPTION "An extremely useful application that makes use of MyLib")
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_DESCRIPTION "Static libraries used to build programs with MyLib")
+
+        # Define dependencies between components
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_DEPENDS ${Application_Name})
+
+        # Define groups
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_GROUP "Runtime")
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_GROUP "Development")
+
+        set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION "All of the tools you'll ever need to develop software")
+
+        # Define NSIS installation types
+        set(CPACK_ALL_INSTALL_TYPES Full Developer)
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_INSTALL_TYPES Developer Full)
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_INSTALL_TYPES Full)
     ENDIF ()
 
     INCLUDE(CPack)
