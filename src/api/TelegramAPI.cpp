@@ -1,8 +1,6 @@
 #include "api/TelegramAPI.h"
 #include "Logger.h"
 
-#include <climits>
-
 int TelegramAPI::sendMessage(const std::string &text) {
     Hashmap<std::string, std::string> args;
     args.add("chat_id", chatid);
@@ -12,8 +10,8 @@ int TelegramAPI::sendMessage(const std::string &text) {
 
     std::string reply = request("https://api.telegram.org/bot" + apikey + "/sendmessage", false, args, headers);
 
-    if (reply.find("\"error_code\"") != ULONG_MAX) {
-        Logger::error("failed to refresh the ip (Dynu API)");
+    if (reply.find("\"error_code\"") != SIZE_MAX) {
+        Logger::error("failed to send the Telegram Message");
         return -1;
     }
     return 1;

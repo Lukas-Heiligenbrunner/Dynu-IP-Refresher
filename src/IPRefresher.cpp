@@ -4,7 +4,7 @@
 #include "api/DynuAPI.h"
 #include "api/TelegramAPI.h"
 #include "Config.h"
-#include "Version.h"
+#include "StaticData.h"
 #include "IpHelper.h"
 
 #include <chrono>
@@ -53,7 +53,7 @@ void IPRefresher::checkIPAdress(bool force) {
 IPRefresher::IPRefresher(bool loop) {
     if (loop) {
         Logger::message("startup of service");
-        Logger::message("Version: " + Version::VERSION);
+        Logger::message("Version: " + StaticData::VERSION);
 
         while (true) {
             Logger::message("starting check");

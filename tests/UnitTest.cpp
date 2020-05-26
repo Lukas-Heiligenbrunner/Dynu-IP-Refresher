@@ -4,7 +4,6 @@
 
 #include <FileLogger.h>
 #include <api/IPAPI.h>
-#include <climits>
 #include "gtest/gtest.h"
 
 /**
@@ -21,7 +20,7 @@ TEST(ReadIp, testzeroIpIfNotExists) {
 TEST(IPAPI, testIpAPIcheckIPSyntax) {
     IPAPI ipapi;
     std::string ip = ipapi.getGlobalIp();
-    if (ip.find('.') == ULONG_MAX) {
+    if (ip.find('.') == SIZE_MAX) {
         // error when ip doesn't contain a .
         ASSERT_TRUE(false);
     } else {

@@ -1,6 +1,6 @@
 #include "Config.h"
 #include "Logger.h"
-#include "Version.h"
+#include "StaticData.h"
 
 #include <iostream>
 #include <cstring>
@@ -20,7 +20,7 @@ bool Config::telegramSupport;
 bool Config::readConfig() {
     libconfig::Config cfg;
     try {
-        cfg.readFile(std::string(Version::ConfigDir + Version::ConfName).c_str());
+        cfg.readFile(std::string(StaticData::ConfigDir + StaticData::ConfName).c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
         std::cout << "I/O error while reading config file." << std::endl << "creating new config file!" << std::endl;
@@ -28,13 +28,14 @@ bool Config::readConfig() {
         // check if config folder exists
         struct stat info{};
 
-        if (stat(Version::ConfigDir.c_str(), &info) != 0) {
+        if (stat(StaticData::ConfigDir.c_str(), &info) != 0) {
             Logger::warning("The config folder doesn't exist. Trying to create it.");
 
+// mkdir command is different defined for windows
 #ifdef __unix
-            int check = mkdir(Version::ConfigDir.c_str(), 777);
+            int check = mkdir(StaticData::ConfigDir.c_str(), 777);
 #else
-            int check = mkdir(Version::ConfigDir.c_str());
+            int check = mkdir(StaticData::ConfigDir.c_str());
 #endif
 
             // check if directory is created or not
@@ -51,9 +52,9 @@ bool Config::readConfig() {
 
 
         std::ofstream myfile;
-        myfile.open(Version::ConfigDir + Version::ConfName);
+        myfile.open(StaticData::ConfigDir + StaticData::ConfName);
         if (myfile.is_open()) {
-            myfile << Version::SAMPLECONFIG;
+            myfile << StaticData::SAMPLECONFIG;
             myfile.close();
         } else {
             Logger::error("error creating file");
@@ -94,7 +95,7 @@ bool Config::validateConfig() {
     libconfig::Config cfg;
     try {
         Logger::message("reading config file");
-        cfg.readFile(Version::ConfigDir.c_str());
+        cfg.readFile(StaticData::ConfigDir.c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
         Logger::warning("config file doesn't exist or permission denied!");
