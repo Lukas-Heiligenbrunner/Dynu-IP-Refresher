@@ -91,11 +91,16 @@ bool Config::readConfig() {
     return !(Config::dynuapikey.empty() || Config::domainid.empty() || Config::domainname.empty());
 }
 
+bool Config::saveConfig() {
+    // todo save config
+    return false;
+}
+
 bool Config::validateConfig() {
     libconfig::Config cfg;
     try {
         Logger::message("reading config file");
-        cfg.readFile(StaticData::ConfigDir.c_str());
+        cfg.readFile(std::string(StaticData::ConfigDir + StaticData::ConfName).c_str());
     }
     catch (const libconfig::FileIOException &fioex) {
         Logger::warning("config file doesn't exist or permission denied!");
@@ -164,4 +169,14 @@ const std::string &Config::getChatId() {
     return chatId;
 }
 
-Config::Config() = default;
+void Config::setValues(const std::string &domainname, const std::string &dynuapikey, const std::string &domainid) {
+    Config::domainname = domainname;
+    Config::dynuapikey = dynuapikey;
+    Config::domainid = domainid;
+}
+
+void Config::setValues(const std::string &domainname, const std::string &dynuapikey, const std::string &domainid, const std::string &telegramApiKey, const std::string &chatId) {
+    setValues(domainname, dynuapikey, domainid);
+    Config::telegramApiKey = telegramApiKey;
+    Config::chatId = chatId;
+}

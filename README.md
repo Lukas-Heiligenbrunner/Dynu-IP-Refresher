@@ -2,6 +2,7 @@
 # DynuIPRefresher
 A lightweight C++ application to setup a service for refreshing a dynamic IP to the Dynu servers. 
 Dynu.com is a free DDns service and provides an API.
+There is also a GUI for Windows Users and beginners.
 
 ## Installation
 Download the latest Release at [Release_Page](https://github.com/Lukas-Heiligenbrunner/DynuIPRefresher/releases).
@@ -30,6 +31,17 @@ help page:
 [-ip] [--currentip] get current global ip
 [no argument] normal ip check and refresh
 ```
+
+### GUI 
+
+You can also build the grapical user inteface if you want. 
+There you can manually trigger a refresh in a gui and set all the config parameters.
+
+Home Page:
+![couldn't load image](https://i.ibb.co/syDwWQg/Screenshot-20200608-104253.png)
+
+Config Page:
+![couldn't load image](https://i.ibb.co/89vnJXY/Screenshot-20200608-104308.png)
 
 
 ## Build
@@ -85,6 +97,10 @@ cd into downloaded files and Generate makefiles:
 
 `make package`
 
+### GUI Build
+
+please use the predefined Docker-Image here: 
+[DockerHub](https://hub.docker.com/repository/docker/luki42/dynuiprefresher_build)
 
 
 ### Windows cross build
@@ -99,5 +115,7 @@ Optional dependencies
 * NSIS Pack tool (for creating installer)
 * doxygen (for generating html doc)
 
-Some addition configuration of lib paths may be needed in CMakeList.txt. 
+The Simplest way to install all dependencies is the preconfigured Docker-Image:
+[DockerHub](https://hub.docker.com/repository/docker/luki42/dynuiprefresher_build)
+
 `make package` will pack it into a NSIS installer for Windows. 

@@ -9,22 +9,25 @@
 
 #pragma once
 
-class IPRefresher {
-public:
+namespace IPRefresher {
+    /**
+     * Status return-codes for startUpService
+     */
+    namespace Status_Code {
+        const int SUCCESS = 1;
+        const int ERROR = -1;
+        const int ERROR_NO_INTERNET = -2;
+        const int NOREFRESH = 0;
+    }
+
     /**
      * refresh ip address on Dynu server
      */
-    void checkIPAdress(bool force);
-
-    /**
-     * default constructor
-     */
-    IPRefresher() = default;
+    bool checkIPAdress(bool force);
 
     /**
      * start the service in loop mode
      * every 5 minutes the ip is checked an refreshed (needed for .service)
-     * @param loop true->loopmode on
      */
-    explicit IPRefresher(bool loop);
-};
+    void startUpService(int interval = 300);
+}

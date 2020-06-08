@@ -19,7 +19,8 @@ SET(LIB_METHOD STATIC) #SHARED / STATIC
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
 option(PACKAGING "Allow Packaging to <exe>, <deb> or <rpm>" ON) # additional dependencies for RPMbuild,dpkg  or NSIS
 option(TESTS "Build Tests" ON) # additional dependencies for GTEST - to build tests
-option(WinBuild "cross compile for Windows Platform" OFF)
+option(GUI "Build GUI elements" ON) # additional dependencies to QT libraries needed
+option(WinBuild "cross compile for Windows Platform" ON)
 
 # helper variables
 SET(CMAKE_CXX_STANDARD 17)
@@ -112,6 +113,10 @@ if (${WinBuild})
     message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
     message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
 
+    if (${GUI})
+        set(CMAKE_PREFIX_PATH "/usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/cmake")
+    endif ()
+
     include_directories(${LIBCONFIG++_INCLUDE_DIRS})
 else ()
     find_package(CURL REQUIRED)
@@ -142,6 +147,16 @@ else ()
     endif ()
 
     include_directories(${LIBCONFIG_INCLUDE_DIRS})
+endif ()
+
+
+if (${GUI})
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5PrintSupport REQUIRED)
+    find_package(Qt5Sql REQUIRED)
 endif ()
 
 include_directories(inc)
@@ -192,34 +207,112 @@ add_executable(${Application_Name} src/main.cpp)
 # LINK generated LIBS #
 target_link_libraries(${Application_Name} libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
 
+if (${GUI})
+    set(QT5_LIBRARIES Qt5::Widgets Qt5::PrintSupport Qt5::Sql)
+
+    set(UI_SOURCES
+            src/gui/mainwindow.ui
+            )
+
+    #
+    # Generate necessary headers from .ui files. (qmake lets `uic` do this job.)
+    # hint from [Cross-platform Qt5 project using cmake](http://stackoverflow.com/questions/21174586/cross-platform-qt5-project-using-cmake)
+    #
+    qt5_wrap_ui(UI_GENERATED_HEADERS ${UI_SOURCES})
+
+    add_executable(${Application_Name}-gui
+            src/maingui.cpp
+            src/gui/MainWindow.cpp
+            inc/gui/MainWindow.h
+            ${UI_GENERATED_HEADERS})
+
+    if (${WinBuild})
+        # hide console window when starting ui on windows
+        set_target_properties(${Application_Name}-gui PROPERTIES LINK_FLAGS "-mwindows")
+    endif ()
+
+    # LINK generated LIBS #
+    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
+endif ()
+
 # setting install targets
 IF (NOT ${WinBuild})
     # INSTALL to Linux SYSTEM #
 
     # install binaries
-    install(TARGETS ${Application_Name} DESTINATION usr/bin)
+    install(
+            TARGETS ${Application_Name}
+            DESTINATION usr/bin
+            COMPONENT ${Application_Name})
     # install systemd service and enable it
-    install(FILES service/${Application_Name}.service DESTINATION lib/systemd/system)
+    install(
+            FILES service/${Application_Name}.service
+            DESTINATION lib/systemd/system
+            COMPONENT ${Application_Name})
+
+    if (${GUI})
+        # install binaries
+        install(
+                TARGETS ${Application_Name}-gui
+                DESTINATION usr/bin
+                COMPONENT ${Application_Name}gui)
+    endif ()
 ELSE ()
     # INSTALL to Windows SYSTEM #
 
     # install binary to current folder
     set_target_properties(${Application_Name} PROPERTIES SUFFIX ".exe")
-    install(TARGETS ${Application_Name} DESTINATION .)
+    install(
+            TARGETS ${Application_Name}
+            DESTINATION .
+            COMPONENT ${Application_Name})
 
     # install .dll dependencies
     # todo check if files exist...
+    SET(LIBBINARYPATH "/usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin")
     install(FILES /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcurl-4.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssh2-1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libstdc++-6.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libgcc_s_seh-1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libcrypto-1_1-x64.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libssl-1_1-x64.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libwinpthread-1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/zlib1.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libidn2-0.dll
-            /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/bin/libconfig++-11.dll
-            DESTINATION .)
+            ${LIBBINARYPATH}/libssh2-1.dll
+            ${LIBBINARYPATH}/libstdc++-6.dll
+            ${LIBBINARYPATH}/libgcc_s_seh-1.dll
+            ${LIBBINARYPATH}/libcrypto-1_1-x64.dll
+            ${LIBBINARYPATH}/libssl-1_1-x64.dll
+            ${LIBBINARYPATH}/libwinpthread-1.dll
+            ${LIBBINARYPATH}/zlib1.dll
+            ${LIBBINARYPATH}/libidn2-0.dll
+            ${LIBBINARYPATH}/libconfig++-11.dll
+            DESTINATION .
+            COMPONENT ${Application_Name})
+
+    if (${GUI})
+        # install binaries
+        set_target_properties(${Application_Name}-gui PROPERTIES SUFFIX ".exe")
+        install(
+                TARGETS ${Application_Name}-gui
+                DESTINATION .
+                COMPONENT ${Application_Name}gui)
+
+        # install .dll dependencies
+        install(FILES
+                ${LIBBINARYPATH}/Qt5Widgets.dll
+                ${LIBBINARYPATH}/Qt5Core.dll
+                ${LIBBINARYPATH}/Qt5Gui.dll
+                ${LIBBINARYPATH}/iconv.dll
+                ${LIBBINARYPATH}/libpcre2-16-0.dll
+                ${LIBBINARYPATH}/libpng16-16.dll
+                ${LIBBINARYPATH}/libharfbuzz-0.dll
+                ${LIBBINARYPATH}/libglib-2.0-0.dll
+                ${LIBBINARYPATH}/libintl-8.dll
+                ${LIBBINARYPATH}/libpcre-1.dll
+                ${LIBBINARYPATH}/libbz2-1.dll
+                ${LIBBINARYPATH}/libfreetype-6.dll
+                DESTINATION .
+                COMPONENT ${Application_Name}gui)
+
+        install(FILES
+                /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/qt5/plugins/platforms/qwindows.dll
+                DESTINATION ./platforms
+                COMPONENT ${Application_Name}gui)
+    endif ()
 ENDIF ()
 
 if (${PACKAGING})
@@ -265,8 +358,19 @@ systemctl start ${Application_Name}.service")
             message(STATUS "found rpm build executeable --> able to build rpm")
             SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
             SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/postinst")
-            SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/lib/systemd/system" "/lib/systemd" "/lib" "/usr/local/bin" "/usr/local") # --> needed to not override existing folders
+            SET(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+                    "/lib/systemd/system"
+                    "/lib/systemd"
+                    "/lib"
+                    "/usr/local/bin"
+                    "/usr/local") # --> not override existing folders
+
+            # dependency management tested with fedora!
             set(CPACK_RPM_PACKAGE_REQUIRES "libcurl,libconfig")
+            if (${GUI})
+                # append rpm GUI dependencies (qt5)
+                set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES},qt5-qtbase")
+            endif ()
         else (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
             message(STATUS "not found rpm build tools --> not building rpm")
         endif (NOT ${RPMBUILD_EXECUTABLE} STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
@@ -276,7 +380,13 @@ systemctl start ${Application_Name}.service")
             message(STATUS "found deb build tools --> able to build deb")
             SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB") # add deb generator
             set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/postinst") # set post inst file
+
+            # dependency management tested with fedora!
             set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4,libconfig++9v5") # add debian dependencies
+            if (${GUI})
+                # append debian GUI dependencies (qt5)
+                set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS},qt5-default")
+            endif ()
         else (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
             message(STATUS "not found  deb build tools --> not building deb")
         endif (NOT ${DEB_EXECUTABLE} STREQUAL "DEB_EXECUTABLE-NOTFOUND")
@@ -291,9 +401,37 @@ systemctl start ${Application_Name}.service")
         set(CPACK_GENERATOR NSIS)
         message(STATUS "Using NSIS Package build.")
 
-        set(CPACK_NSIS_testcomp_INSTALL_DIRECTORY /)
+        set(CPACK_NSIS_EXECUTABLES_DIRECTORY "DynuIpRefresher")
         set(CPACK_PACKAGE_INSTALL_DIRECTORY "DynuIpRefresher")
         SET(CPACK_NSIS_MODIFY_PATH ON)
+        set(CPACK_NSIS_MENU_LINKS
+                "${Application_Name}.exe" "DynuIpRefresher Console"
+                "${Application_Name}-gui.exe" "DynuIpRefresher GUI")
+
+        # varnames need uppercase strings
+        string(TOUPPER ${Application_Name} APPLICATION_NAME_UPPER)
+        # Define components and their display names
+        set (CPACK_COMPONENTS_ALL ${Application_Name} ${Application_Name}gui)
+        set (CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_DISPLAY_NAME "Dynu IP Refresher Console")
+        set (CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_DISPLAY_NAME "Dynu IP Refresher GUI")
+
+        # Human readable component descriptions
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_DESCRIPTION "An extremely useful application that makes use of MyLib")
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_DESCRIPTION "Static libraries used to build programs with MyLib")
+
+        # Define dependencies between components
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_DEPENDS ${Application_Name})
+
+        # Define groups
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_GROUP "Runtime")
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_GROUP "Development")
+
+        set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION "All of the tools you'll ever need to develop software")
+
+        # Define NSIS installation types
+        set(CPACK_ALL_INSTALL_TYPES Full Developer)
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}_INSTALL_TYPES Developer Full)
+        set(CPACK_COMPONENT_${APPLICATION_NAME_UPPER}GUI_INSTALL_TYPES Full)
     ENDIF ()
 
     INCLUDE(CPack)
