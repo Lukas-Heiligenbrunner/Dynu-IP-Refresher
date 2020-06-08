@@ -8,7 +8,7 @@ cmake:
   stage: cmake
   image: luki42/dynuiprefresher_build:latest
   script:
-    - cmake -S . -B build
+    - cmake -S . -B build -D WinBuild=OFF -D GUI=OFF
   artifacts:
     paths:
       - build/
