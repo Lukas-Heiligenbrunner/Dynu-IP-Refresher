@@ -11,8 +11,6 @@
 #include <thread>
 #include <Logger.h>
 
-using namespace IPRefresher;
-
 bool IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
 
@@ -60,17 +58,14 @@ bool IPRefresher::checkIPAdress(bool force) {
 void IPRefresher::startUpService(int interval) {
     Logger::message("startup of service");
     Logger::message("Version: " + StaticData::VERSION);
-    if (Config::readConfig()) {
-        while (true) {
-            Logger::message("starting check");
-            if (Config::readConfig()) {
-                checkIPAdress(false);
-            } else {
-                std::cout << "incorrect credentials!" << std::endl;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(interval * 1000));
+
+    while (true) {
+        Logger::message("starting check");
+        if (Config::readConfig()) {
+            checkIPAdress(false);
+        } else {
+            std::cout << "incorrect credentials!" << std::endl;
         }
-    } else {
-        std::cout << "incorrect credentials!" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(interval * 1000));
     }
 }
