@@ -1,0 +1,6 @@
+ [requires]
+ libcurl/7.72.0@heili/release
+
+ [generators]
+ cmake
+

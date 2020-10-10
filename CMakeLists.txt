@@ -13,7 +13,7 @@ project(dynuiprefresher DESCRIPTION "Dynu ip refresher" LANGUAGES)
 SET(PROJECT_VERSION 1.3.4)
 
 # CONFIGURATION
-SET(CMAKE_BUILD_TYPE Release) # manually SET build type (Release / Debug)
+SET(CMAKE_BUILD_TYPE Debug) # manually SET build type (Release / Debug)
 SET(LIB_METHOD STATIC) #SHARED / STATIC
 
 option(BUILD_DOC "Build documentation" ON) # additional dependency for Doxygen
@@ -93,61 +93,9 @@ enable_language(C)
 # config libs
 message("")
 message(STATUS "Config of Libraries")
-# libcurl
-if (${WinBuild})
-    SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
-    # configure libcurl
-    FIND_PATH(CURL_INCLUDE_DIRS curl/curl.h /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
-    FIND_LIBRARY(CURL_LIBRARIES NAMES libcurl.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
 
-    message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
-    message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
-    message(STATUS "")
-
-    include_directories(${CURL_INCLUDE_DIRS})
-
-    # configure libconfig
-    FIND_PATH(LIBCONFIG++_INCLUDE_DIRS libconfig.h++ /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/include/) # search for libconfig include headers
-    FIND_LIBRARY(LIBCONFIG++_LIBRARIES NAMES libconfig++.dll.a HINTS /usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib) # search for actual lib
-
-    message(STATUS "Using LIBCONFIG++ include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
-    message(STATUS "Using LIBCONFIG++ lib(s): ${LIBCONFIG++_LIBRARIES}")
-
-    if (${GUI})
-        set(CMAKE_PREFIX_PATH "/usr/${TOOLCHAIN_PREFIX}/sys-root/mingw/lib/cmake")
-    endif ()
-
-    include_directories(${LIBCONFIG++_INCLUDE_DIRS})
-else ()
-    find_package(CURL REQUIRED)
-    if (CURL_INCLUDE_DIRS AND CURL_LIBRARIES)
-        message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
-        message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
-        message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
-    else ()
-        message(FATAL_ERROR "Could not find CURL")
-    endif ()
-    include_directories(${CURL_INCLUDE_DIR})
-
-    message("")
-    # libconfig
-    FIND_PATH(LIBCONFIG++_INCLUDE_DIRS
-            NAMES libconfig.h++
-            PATHS /usr/include /usr/local/include) # search for libconfig include headers
-    FIND_LIBRARY(LIBCONFIG++_LIBRARIES
-            NAMES config++
-            PATHS /usr/lib /usr/local/lib) # search for actual lib
-
-    if (LIBCONFIG++_INCLUDE_DIRS AND LIBCONFIG++_LIBRARIES)
-        message(STATUS "Fount libconfig!")
-        message(STATUS "Using libconfig include dir(s): ${LIBCONFIG++_INCLUDE_DIRS}")
-        message(STATUS "Using libconfig lib(s): ${LIBCONFIG++_LIBRARIES}")
-    else ()
-        message(FATAL_ERROR "Could not find LIBCONFIG")
-    endif ()
-
-    include_directories(${LIBCONFIG_INCLUDE_DIRS})
-endif ()
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
 
 
 if (${GUI})
@@ -196,16 +144,15 @@ add_library(api ${LIB_METHOD}
 
 add_library(libdynuiprefresher ${LIB_METHOD}
         src/IPRefresher.cpp
-        src/Config.cpp
         src/IpHelper.cpp
         src/FileLogger.cpp
         src/Logger.cpp
-        )
+        src/ConfigParser.cpp)
 
 add_executable(${Application_Name} src/main.cpp)
 
 # LINK generated LIBS #
-target_link_libraries(${Application_Name} libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES})
+target_link_libraries(${Application_Name} libdynuiprefresher api CONAN_PKG::libcurl)
 
 if (${GUI})
     set(QT5_LIBRARIES Qt5::Widgets Qt5::PrintSupport Qt5::Sql)
@@ -232,7 +179,7 @@ if (${GUI})
     endif ()
 
     # LINK generated LIBS #
-    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api ${CURL_LIBRARIES} ${LIBCONFIG++_LIBRARIES} ${QT5_LIBRARIES})
+    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl ${QT5_LIBRARIES})
 endif ()
 
 # setting install targets

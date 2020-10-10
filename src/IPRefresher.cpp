@@ -3,13 +3,13 @@
 #include "api/IPAPI.h"
 #include "api/DynuAPI.h"
 #include "api/TelegramAPI.h"
-#include "Config.h"
 #include "StaticData.h"
 #include "IpHelper.h"
 
 #include <chrono>
 #include <thread>
 #include <Logger.h>
+#include <inc/ConfigParser.h>
 
 bool IPRefresher::checkIPAdress(bool force) {
     FileLogger logger;
@@ -35,13 +35,13 @@ bool IPRefresher::checkIPAdress(bool force) {
             Logger::message("ip changed! -- from :" + oldip + "to: " + ip);
 
             DynuAPI dynu;
-            dynu.init(Config::getDynuapikey(), Config::getDomainid(), Config::getDomainname());
+            dynu.init(ConfigParser::getDynuapikey(), ConfigParser::getDomainid(), ConfigParser::getDomainname());
             // actual refresh of IP in api - here
             bool result = dynu.refreshIp(ip);
 
-            if (result && Config::isTelegramSupported()) {
+            if (result && ConfigParser::isTelegramSupported()) {
                 TelegramAPI tele;
-                tele.init(Config::getTelegramApiKey(), Config::getChatId());
+                tele.init(ConfigParser::getTelegramApiKey(), ConfigParser::getChatId());
                 tele.sendMessage(oldip + " moved to " + ip);
             } else if (!result) {
                 //error
@@ -61,7 +61,7 @@ void IPRefresher::startUpService(int interval) {
 
     while (true) {
         Logger::message("starting check");
-        if (Config::readConfig()) {
+        if (ConfigParser::loadConfig()) {
             checkIPAdress(false);
         } else {
             std::cout << "incorrect credentials!" << std::endl;

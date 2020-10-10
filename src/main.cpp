@@ -1,8 +1,8 @@
 #include "StaticData.h"
 #include "IPRefresher.h"
 #include "Logger.h"
-#include "Config.h"
 #include "api/IPAPI.h"
+#include "ConfigParser.h"
 
 /**
  * application entry point
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         } else if (firstarg == "-v" || firstarg == "--version") {
             std::cout << "Version " << StaticData::VERSION << std::endl;
         } else if (firstarg == "-f" || firstarg == "--force") {
-            if (Config::readConfig()) {
+            if (ConfigParser::loadConfig()) {
                 IPRefresher::checkIPAdress(true);
             } else {
                 std::cout << "incorrect credentials!" << std::endl;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
         } else if (firstarg == "-l" || firstarg == "--loop") {
             IPRefresher::startUpService(true);
         } else if (firstarg == "-c" || firstarg == "--checkconfig") {
-            if (Config::validateConfig()) {
+            if (ConfigParser::validateConfig()) {
                 Logger::message("Config file is OK");
             } else {
                 Logger::error("There are errors in config file!");
@@ -43,8 +43,11 @@ int main(int argc, char *argv[]) {
             Logger::message("wrong arguments!  -h for help");
         }
     } else {
+        ConfigParser::loadConfig();
+
+        return 0;
         Logger::message("starting check");
-        if (Config::readConfig()) {
+        if (ConfigParser::loadConfig()) {
             IPRefresher::checkIPAdress(false);
         } else {
             std::cout << "incorrect credentials!" << std::endl;
