@@ -136,6 +136,7 @@ namespace StaticData {
 }"
         )
 
+#define libraries with sources here
 add_library(api ${LIB_METHOD}
         src/api/API.cpp
         src/api/TelegramAPI.cpp
@@ -147,12 +148,14 @@ add_library(libdynuiprefresher ${LIB_METHOD}
         src/IpHelper.cpp
         src/FileLogger.cpp
         src/Logger.cpp
-        src/ConfigParser.cpp)
+        src/Config.cpp)
 
 add_executable(${Application_Name} src/main.cpp)
 
+message(${CONAN_LIBS})
+
 # LINK generated LIBS #
-target_link_libraries(${Application_Name} libdynuiprefresher api CONAN_PKG::libcurl)
+target_link_libraries(${Application_Name} libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig)
 
 if (${GUI})
     set(QT5_LIBRARIES Qt5::Widgets Qt5::PrintSupport Qt5::Sql)
@@ -179,7 +182,7 @@ if (${GUI})
     endif ()
 
     # LINK generated LIBS #
-    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl ${QT5_LIBRARIES})
+    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig ${QT5_LIBRARIES})
 endif ()
 
 # setting install targets

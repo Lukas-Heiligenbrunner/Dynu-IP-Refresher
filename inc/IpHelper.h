@@ -16,7 +16,7 @@ public:
      * @param ip ip address to test
      * @return validity
      */
-    static bool isIpValid(std::string ip);
+    static bool isIpValid(const std::string& ip);
 
 private:
 };
