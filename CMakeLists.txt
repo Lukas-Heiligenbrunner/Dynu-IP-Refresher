@@ -97,14 +97,12 @@ message(STATUS "Config of Libraries")
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
-
 if (${GUI})
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-    find_package(Qt5Widgets REQUIRED)
-    find_package(Qt5PrintSupport REQUIRED)
-    find_package(Qt5Sql REQUIRED)
+    # Find the QtWidgets library
+    find_package(Qt5 REQUIRED COMPONENTS Widgets)
 endif ()
 
 include_directories(inc)
@@ -182,7 +180,7 @@ if (${GUI})
     endif ()
 
     # LINK generated LIBS #
-    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig ${QT5_LIBRARIES})
+    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig CONAN_PKG::libQt5Widgets})
 endif ()
 
 # setting install targets

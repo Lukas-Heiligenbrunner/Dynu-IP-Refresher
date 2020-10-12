@@ -10,7 +10,7 @@ cmake:
   script:
     - mkdir build
     - cd build
-    - conan install ..
+    - conan install .. --build=missing
     - cmake -S . -B build -D WinBuild=OFF -D GUI=OFF
   artifacts:
     paths:
