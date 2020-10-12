@@ -6,8 +6,11 @@ stages:
 # Unix Build
 cmake:
   stage: cmake
-  image: luki42/dynuiprefresher_build:latest
+  image: conanio/gcc9:latest
   script:
+    - mkdir build
+    - cd build
+    - conan install ..
     - cmake -S . -B build -D WinBuild=OFF -D GUI=OFF
   artifacts:
     paths:
