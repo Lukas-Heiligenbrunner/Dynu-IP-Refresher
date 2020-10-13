@@ -10,6 +10,8 @@ cmake:
   script:
     - mkdir build
     - cd build
+    - conan remote add gitlab https://gitlab.heili.eu/api/v4/projects/55/packages/conan
+    - conan user lukas -r gitlab -p $CONAN_KEY
     - conan install .. --build=missing
     - cmake -S . -B build -D WinBuild=OFF -D GUI=OFF
   artifacts:

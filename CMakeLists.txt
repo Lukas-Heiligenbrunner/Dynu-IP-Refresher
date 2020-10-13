@@ -94,6 +94,7 @@ enable_language(C)
 message("")
 message(STATUS "Config of Libraries")
 
+# include conan libraries
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
@@ -150,8 +151,6 @@ add_library(libdynuiprefresher ${LIB_METHOD}
 
 add_executable(${Application_Name} src/main.cpp)
 
-message(${CONAN_LIBS})
-
 # LINK generated LIBS #
 target_link_libraries(${Application_Name} libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig)
 
@@ -180,7 +179,7 @@ if (${GUI})
     endif ()
 
     # LINK generated LIBS #
-    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig CONAN_PKG::libQt5Widgets})
+    target_link_libraries(${Application_Name}-gui -lpthread libdynuiprefresher api CONAN_PKG::libcurl CONAN_PKG::LibConfig Qt5::Widgets)
 endif ()
 
 # setting install targets
