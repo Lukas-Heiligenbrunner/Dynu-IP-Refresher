@@ -2,7 +2,7 @@
  libcurl/7.72.0
  qt/5.15.1@bincrafters/stable
  openssl/1.1.1h
- LibConfig/1.7.2@prebuiltconanbinaries/stable
+ LibConfig/1.7.2@LibConfig/stable
 
  [generators]
  cmake
